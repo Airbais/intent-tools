@@ -1,0 +1,69 @@
+crawler:
+  max_pages: 1000
+  rate_limit: 2
+  respect_robots: true
+  follow_redirects: true
+  timeout: 30
+  use_sitemap: true
+
+content:
+  min_content_length: 100
+  max_summary_length: 500
+  include_metadata: true
+
+intents:
+  extraction_method: 'user_intent'  # Focus on customer goals and purposes
+  min_cluster_size: 3
+  similarity_threshold: 0.7
+  max_intents_per_page: 5
+  
+  # User intent extraction settings
+  min_confidence_threshold: 0.1
+  focus_on_customer_goals: true
+  
+  # Fine-tuning options
+  custom_intent_patterns_file: 'intent_patterns.yaml'  # External pattern file
+  industry_domain: 'saas'  # saas, ecommerce, education, healthcare, etc.
+  intent_confidence_boosters:
+    high_value_signals: ['pricing', 'enterprise', 'roi', 'security']  # Boost these
+    quality_indicators: ['tutorial', 'step-by-step', 'guide']        # Quality content
+  
+  # Sensitivity controls
+  pain_point_sensitivity: 0.3      # How aggressively to detect pain points
+  action_verb_weight: 0.4          # Weight for action-oriented content
+  outcome_signal_weight: 0.3       # Weight for goal/outcome language
+  
+  # Dynamic extraction settings (if using 'dynamic' method)
+  use_embeddings: true
+  use_lda: true
+  lda_topics: 10
+  embeddings_model: 'sentence-transformers/all-MiniLM-L6-v2'
+  fallback_keywords: true
+  
+  # Baseline categories (if using 'original' method)
+  baseline_categories:
+    - informational
+    - navigational
+    - transactional
+    
+  # Custom keywords (fallback)
+  custom_keywords:
+    product_discovery: ['products', 'catalog', 'browse', 'categories']
+    comparison: ['compare', 'vs', 'versus', 'differences']
+    support: ['help', 'support', 'faq', 'documentation']
+    integration: ['integration', 'api', 'developer', 'sdk']
+
+dashboard:
+  port: 8050
+  auto_open_browser: true
+  export_formats: ['json', 'pdf']
+  refresh_interval: 5
+  recommendation_depth: 'detailed'
+
+output:
+  base_directory: 'results'
+  date_format: '%Y-%m-%d'
+  keep_past_results: 7  # Number of past results to keep, -1 for all
+  overwrite_today: true
+
+test_website: "https://gofastmcp.com/"

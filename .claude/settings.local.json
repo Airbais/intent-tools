@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:llmstxt.org)",
+      "WebFetch(domain:medium.com)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "Bash(python:*)",
+      "Bash(ls:*)"
+    ],
+    "deny": []
+  }
+}

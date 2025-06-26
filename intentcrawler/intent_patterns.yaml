@@ -1,0 +1,51 @@
+# External configuration for intent patterns
+# You can modify these patterns based on your industry/domain
+
+research_and_compare:
+  signals:
+    - '\b(?:compare|comparison|vs|versus|difference|alternative|option|choice)\b'
+    - '\b(?:pros and cons|advantages|disadvantages|benefits|drawbacks)\b'
+    - '\b(?:which is better|best option|recommend|suggestion)\b'
+    - '\b(?:reviews?|ratings?|testimonials?|feedback)\b'
+    # Add your domain-specific patterns here
+    - '\b(?:benchmark|evaluation|assessment)\b'
+  user_goals:
+    - 'compare options'
+    - 'evaluate alternatives' 
+    - 'make informed decision'
+  pain_points:
+    - 'too many choices'
+    - 'unclear differences'
+    - 'need validation'
+
+learn_and_understand:
+  signals:
+    - '\b(?:how to|how do|how can|how does|tutorial|guide|step by step)\b'
+    - '\b(?:learn|understand|explain|definition|meaning|what is)\b'
+    - '\b(?:beginner|getting started|introduction|basics|fundamentals)\b'
+    - '\b(?:examples?|case studies?|best practices?|tips)\b'
+    # Industry-specific learning patterns
+    - '\b(?:onboarding|training|certification)\b'
+  user_goals:
+    - 'acquire new skills'
+    - 'understand concepts'
+    - 'get practical knowledge'
+  pain_points:
+    - 'lack of knowledge'
+    - 'confusion'
+    - 'need guidance'
+
+# Add new intent types for your specific domain
+evaluate_roi_and_justify:
+  signals:
+    - '\b(?:roi|return on investment|cost benefit|justify|business case)\b'
+    - '\b(?:budget|budget approval|stakeholder|decision maker)\b'
+    - '\b(?:metrics|kpi|measurement|track results)\b'
+  user_goals:
+    - 'justify investment to stakeholders'
+    - 'understand business value'
+    - 'measure success'
+  pain_points:
+    - 'need to prove value'
+    - 'limited budget'
+    - 'stakeholder buy-in required'
