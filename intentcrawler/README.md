@@ -1,22 +1,25 @@
-# Website Intent Analysis Tool
+# IntentCrawler - Website Intent Analysis Tool
 
-A Python tool that crawls websites and analyzes the user intents conveyed to LLMs and AI agents. The tool extracts content, discovers intents dynamically using multiple ML techniques, and provides an interactive dashboard for visualization.
+A professional Python tool that crawls websites and analyzes the user intents conveyed to LLMs and AI agents. Part of the Airbais AI Tools Suite, IntentCrawler extracts content, discovers intents dynamically using multiple ML techniques, and provides modern interactive dashboards for visualization.
 
-## Features
+## ✨ Features
 
-- **Web Crawling**: Respectful crawling with robots.txt compliance and rate limiting
-- **Sitemap Support**: Automatically discovers and parses XML sitemaps
-- **Content Processing**: Extracts clean content from web pages
-- **Enhanced Dynamic Intent Discovery:**
+- **🕷️ Intelligent Web Crawling**: Respectful crawling with robots.txt compliance and rate limiting
+- **🗺️ Sitemap Support**: Automatically discovers and parses XML sitemaps
+- **🧹 Content Processing**: Extracts clean content from web pages
+- **🧠 Enhanced Dynamic Intent Discovery:**
+  - User Intent Analysis (default) - focuses on what users want to accomplish
   - Latent Dirichlet Allocation (LDA) for topic modeling
   - Sentence embeddings with clustering
   - Configurable fallback keywords
   - Automatic intent naming and merging
-- **llmstxt Format**: Outputs summaries in the standardized llmstxt format
-- **Site Structure Analysis**: Maps website hierarchy
-- **Interactive Dashboard**: Web-based dashboard with historical results browsing
-- **Date-based Results**: Organized by date with automatic cleanup
-- **Structured Exports**: JSON outputs for LLM tool integration
+- **📝 llmstxt Format**: Outputs summaries in the standardized llmstxt format
+- **🏗️ Site Structure Analysis**: Maps website hierarchy
+- **📊 Modern Interactive Dashboard**: Professional web-based dashboard with Airbais design system
+- **🌙 Light/Dark Mode**: Responsive design with theme persistence
+- **📅 Date-based Results**: Organized by date with automatic cleanup
+- **🔗 Master Dashboard Integration**: Works with centralized multi-tool dashboard
+- **📤 Structured Exports**: JSON outputs for LLM tool integration
 
 ## Installation
 
@@ -29,29 +32,44 @@ A Python tool that crawls websites and analyzes the user intents conveyed to LLM
 
 ## Usage
 
-Basic usage:
+### 🚀 Quick Start
+
+Basic analysis:
 ```bash
-python main.py https://example.com
+python intentcrawler.py https://example.com
 ```
 
 With dashboard:
 ```bash
-python main.py https://example.com --dashboard
+python intentcrawler.py https://example.com --dashboard
 ```
 
 View latest results:
 ```bash
-python main.py --dashboard-only
+python intentcrawler.py --dashboard-only
 ```
 
 View results from specific date:
 ```bash
-python main.py --dashboard-date 2024-06-26
+python intentcrawler.py --dashboard-date 2024-06-26
 ```
 
 List available results:
 ```bash
-python main.py --list-results
+python intentcrawler.py --list-results
+```
+
+### 📊 Dashboard Options
+
+**Local Dashboard** (tool-specific):
+```bash
+python intentcrawler.py --dashboard-only
+```
+
+**Master Dashboard** (all tools):
+```bash
+cd ../dashboard
+python run_dashboard.py
 ```
 
 ## Configuration
@@ -70,14 +88,15 @@ crawler:
 ### Intent Extraction
 ```yaml
 intents:
-  extraction_method: 'dynamic'  # Use enhanced extraction
-  use_embeddings: true          # Use sentence transformers
-  use_lda: true                 # Use topic modeling
-  lda_topics: 10                # Number of LDA topics
+  extraction_method: 'user_intent'  # Default: user-focused analysis
+  # Alternative methods: 'dynamic', 'enhanced', 'original'
+  use_embeddings: true               # Use sentence transformers
+  use_lda: true                     # Use topic modeling  
+  lda_topics: 10                    # Number of LDA topics
   embeddings_model: 'sentence-transformers/all-MiniLM-L6-v2'
-  fallback_keywords: true       # Use keywords as fallback
-  similarity_threshold: 0.7     # For merging similar intents
-  custom_keywords:              # Configurable keywords
+  fallback_keywords: true           # Use keywords as fallback
+  similarity_threshold: 0.7         # For merging similar intents
+  custom_keywords:                  # Configurable keywords
     product_discovery: ['products', 'catalog', 'browse']
     support: ['help', 'support', 'faq']
     integration: ['api', 'developer', 'sdk']
@@ -134,14 +153,25 @@ Intent names are automatically generated based on:
 - Domain-specific terminology
 - Statistical analysis of representative phrases
 
-## Dashboard Features
+## 📊 Dashboard Features
 
-- **Date Selection**: Browse historical results
-- **Intent Distribution**: Visualize discovered intents
-- **Section Analysis**: See intents by site section
-- **Intent Details**: Drill down into specific intents
-- **Site Structure**: Understand content organization
-- **Export Options**: Download data for further analysis
+### Modern Design System
+- **🎨 Airbais Design**: Professional orange/gray color scheme with Inter font
+- **🌙 Light/Dark Mode**: Toggle with persistent preferences
+- **📱 Responsive**: Works on desktop and mobile
+- **⚡ Fast Loading**: Optimized for performance
+
+### Analysis Views
+- **📈 Overview Stats**: Pages analyzed, intents discovered, sections
+- **📊 Intent Distribution**: Interactive bar charts with confidence scores
+- **🏗️ Section Analysis**: Intent breakdown by site structure
+- **📋 Intent Details**: Detailed tables with keywords and page counts
+- **🔍 Site Structure**: Visual representation of content organization
+- **💾 Export Options**: JSON and summary exports for further analysis
+
+### Two Dashboard Options
+1. **Local Dashboard**: Tool-specific view with full feature set
+2. **Master Dashboard**: Multi-tool centralized view (future-ready)
 
 ## Intent Discovery Process
 
@@ -218,13 +248,30 @@ Intent names are automatically generated based on:
 - Verify dashboard-data.json is present
 - Check console for port conflicts
 
-## Future Enhancements
+## 🔗 Integration with AI Tools Suite
 
-- Multi-language support
-- Real-time intent tracking
-- A/B testing integration
-- Custom intent taxonomies
-- API endpoint for programmatic access
+IntentCrawler is part of the larger Airbais AI Tools Suite:
+
+- **🏠 Master Dashboard**: Centralized view of all tool results at `../dashboard/`
+- **🤝 Standard Data Format**: JSON output compatible with other suite tools
+- **🔄 Auto-Discovery**: New tools are automatically detected
+- **🎨 Consistent Design**: Shared design system across all tools
+
+### Master Dashboard Benefits
+- View results from multiple AI tools in one place
+- Tool and date selection dropdowns
+- Consistent professional interface
+- Future-ready architecture for new tools
+
+## 🚀 Future Enhancements
+
+- **🌍 Multi-language support**: Analyze websites in different languages
+- **⏱️ Real-time intent tracking**: Monitor intent changes over time
+- **🧪 A/B testing integration**: Compare intent analysis across variants
+- **🏷️ Custom intent taxonomies**: Define organization-specific intent categories
+- **🔌 API endpoint**: Programmatic access for automated workflows
+- **📱 Mobile app**: Native mobile dashboard
+- **🤖 AI-powered insights**: LLM-generated recommendations
 
 ## Contributing
 

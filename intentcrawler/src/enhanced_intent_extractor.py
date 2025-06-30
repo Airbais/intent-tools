@@ -522,6 +522,7 @@ class EnhancedIntentExtractor:
             'discovered_intents': discovered_intents,
             'by_section': dict(by_section),
             'total_intents_discovered': len(discovered_intents),
+            'total_pages_analyzed': len(processed_contents),
             'extraction_methods_used': list(set(intent.method for intent in intents))
         }
     
