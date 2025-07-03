@@ -1,0 +1,97 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Cache directory
+cache/
+.cache/
+*.cache
+
+# Results and output
+results/
+output/
+reports/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+virtualenv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+*.cover
+.coverage.*
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# pyenv
+.python-version
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+.~*
+
+# API Keys (extra safety)
+*api_key*
+*apikey*
+*.key
+*.pem
+
+# Local configuration overrides
+config.local.md
+*_local.md
+configs/local/
+
+#Custom files
+PROJECT_PLAN.md
+config.md
+debug_openai.py
