@@ -1,0 +1,12 @@
+# Pricing
+
+## Pricing - Obsidian
+
+URL: https://obsidian.md/pricing
+
+--- title Pricing - Obsidian description Obsidian is free and 100 user-supported. sitename Obsidian date 2025-01-01 --- No sign-up required. No strings attached. Optional add-on services make it easy to sync and publish your notes. 4 USD Per user, per month, billed annually 8 USD Per site, per month, billed annually Optional licenses help support the independent development of Obsidian. 25 USD One-time payment Support Obsidian Learn more50 USD Per user, per year Support Obsidian Learn moreFrequently asked questions about pricing No. You are not required to pay for a commercial license, however if you are using Obsidian for work in an organization we encourage you to purchase a commercial license to keep Obsidian independent and 100 user-supported. Learn more. Yes! You can purchase Obsidian Credit for friends, family, and coworkers. This credit can be used to pay for any Obsidian license or service. To get started, create an account and buy credit. You can then send it to the recipient via email or a shareable link. Learn more. Obsidian Publish, and Obsidian Sync  no questions asked. However, please note that Catalyst licenses, Commercial licenses, and Obsidian Credit are non-refundable. Learn more. Obsidian is a private and secure space for your thoughts. You can use our apps without sharing any personal information, and your data is stored locally on your device, making it inaccessible to us. Additionally, our apps do not collect telemetry data, and we never sell user data. If you choose to use Obsidian Sync, your data is secured with AES256 end-to-end encryption, preventing us from reading it. Learn more. Yes, we do! Students, faculty members, and nonprofit employees are eligible for a 40 discount on Obsidian Sync and Publish. We do not offer any other discounts or promotions. Learn more. By becoming a Catalyst member, youll receive early access to beta versions of Obsidian, as well as special badges within the community. Catalyst plays a vital role in helping Obsidian remain 100 user-supported, free from investor influence that could compromise our values.
+
+Keywords: obsidian, and, learn, you, user, per, for, your, more, sync
+
+---
+

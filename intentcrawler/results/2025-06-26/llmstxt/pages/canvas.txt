@@ -1,0 +1,12 @@
+# Canvas
+
+## Obsidian Canvas - Visualize your ideas
+
+URL: https://obsidian.md/canvas
+
+--- title Obsidian Canvas - Visualize your ideas description Obsidian Canvas gives you infinite space to research, brainstorm, diagram, and lay out your ideas. sitename Obsidian date 2025-01-01 --- Infinite space to research, brainstorm, diagram, and lay out your ideas. Canvas comes free with Obsidian. Canvas allows you to organize notes visually  an infinite space to research, brainstorm, diagram and lay out your ideas. Embed your notes alongside images, PDFs, videos, audio, and even fully interactive web pages. Effortlessly add existing notes and media from your vault, and edit them within a Canvas view. Canvas views can be embedded in notes, and even nested within another Canvas. Like everything else in Obsidian, Canvas is extensible and designed to be durable. Our API makes it easy to create plugins that add new capabilities to Canvas. Your Canvas files are stored locally using the open JSON Canvas file format that we designed to work with other tools. Apps, scripts, and plugins can easily enhance Canvas by adding or modifying cards and connections. Explore how members of the Obsidian community are using Canvas for the personal life and at work.
+
+Keywords: canvas, and, your, obsidian, ideas, notes, infinite, space, research, brainstorm
+
+---
+

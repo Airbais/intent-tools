@@ -1,0 +1,12 @@
+# Security
+
+## Security - Obsidian
+
+URL: https://obsidian.md/security
+
+--- title Security - Obsidian description Obsidian is free and 100 user-supported. sitename Obsidian date 2025-01-01 --- Obsidian is designed to be a private and secure space for your thoughts. Heres how we protect your data. Private by default Your data is saved locally on your device. No account is required, no telemetry data is collected.Privacy policy End-to-end encryption With Obsidian Sync, your data is secured using the strongest encryption standard, AES256.Sync security FAQs Transparency Obsidian is built on open formats, trusted encryption algorithms, and independently audited code. Developer policies Independent audits Regular audits by third-party security firms ensure that Obsidian meets the highest security standards. These reports are shared for transparency, and any vulnerabilities are promptly addressed. Penetration test and source code audit of Obsidian apps. Covers all client code, with particular attention to hardening the Web viewer plugin ahead of its release. Following this test, the Cure53 team reported that all vulnerabilities have been addressed and the recommendations have been followed. Penetration test and source code audit of Obsidian apps. Covers all existing client code to date. Following this test, the Cure53 team reported that all vulnerabilities have been addressed and the recommendations have been followed.
+
+Keywords: obsidian, and, the, your, code, security, data, test, all, have
+
+---
+

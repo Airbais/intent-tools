@@ -1,0 +1,28 @@
+# LLM Providers  
+openai>=1.12.0
+anthropic>=0.18.0
+
+# Text Processing and Analysis
+textblob>=0.17.1
+markdown>=3.5.0
+pyyaml>=6.0
+
+# Data Processing
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Utilities
+python-dotenv>=1.0.0
+requests>=2.31.0
+tenacity>=8.2.0  # For retry logic
+diskcache>=5.6.0  # For response caching
+
+# Development and Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+black>=23.0.0
+flake8>=6.0.0
+
+# Logging and Monitoring
+colorlog>=6.7.0
+tqdm>=4.65.0  # Progress bars

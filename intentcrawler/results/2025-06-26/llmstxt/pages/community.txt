@@ -1,0 +1,12 @@
+# Community
+
+## Community Showcase - FastMCP
+
+URL: https://gofastmcp.com/community/showcase
+
+--- title Community Showcase - FastMCP description High-quality projects and examples from the FastMCP community sitename FastMCP date 2024-05-29 --- High-quality projects and examples from the FastMCP community Discover exemplary MCP servers and implementations created by our community. These projects demonstrate best practices and innovative uses of FastMCP. A comprehensive educational example demonstrating FastMCP best practices with professional dual-transport server implementation, interactive test client, and detailed documentation. Build Remote MCP Servers w Python  FastMCP - Claude Integrations Tutorial by Greg  Code FastMCP  the best way to build an MCP server with Python - Tutorial by ZazenCodes Speedrun a MCP server for Claude Desktop fastmcp - Tutorial by Nate from Prefect Have you built something interesting with FastMCP? Wed love to feature high-quality examples here! Start a discussion on GitHub to share your project. To get your project featured We review submissions regularly and feature projects that provide value to the FastMCP community.
+
+Keywords: fastmcp, and, community, projects, the, mcp, high, quality, examples, from
+
+---
+

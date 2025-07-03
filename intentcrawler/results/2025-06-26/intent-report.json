@@ -1,0 +1,1827 @@
+{
+  "metadata": {
+    "generated_at": "2025-06-26T10:48:41.955876",
+    "website_url": "https://gofastmcp.com",
+    "analysis_version": "1.0",
+    "total_pages_analyzed": 0,
+    "total_intents_discovered": 0
+  },
+  "site_structure": {
+    "sections": {
+      "changelog": {
+        "name": "changelog",
+        "page_count": 1,
+        "depth": 2,
+        "parent": null,
+        "subsections": [
+          "clients",
+          "community",
+          "deployment",
+          "getting-started",
+          "integrations",
+          "patterns",
+          "python-sdk",
+          "servers",
+          "tutorials"
+        ],
+        "url_pattern": "/changelog/*",
+        "importance": 6.0
+      },
+      "clients": {
+        "name": "clients",
+        "page_count": 12,
+        "depth": 3,
+        "parent": "changelog",
+        "subsections": [],
+        "url_pattern": "/clients/*",
+        "importance": 59.678
+      },
+      "community": {
+        "name": "community",
+        "page_count": 1,
+        "depth": 3,
+        "parent": "changelog",
+        "subsections": [],
+        "url_pattern": "/community/*",
+        "importance": 4.115
+      },
+      "deployment": {
+        "name": "deployment",
+        "page_count": 2,
+        "depth": 3,
+        "parent": "changelog",
+        "subsections": [],
+        "url_pattern": "/deployment/*",
+        "importance": 10.0
+      },
+      "getting-started": {
+        "name": "getting-started",
+        "page_count": 4,
+        "depth": 3,
+        "parent": "changelog",
+        "subsections": [],
+        "url_pattern": "/getting-started/*",
+        "importance": 30.0
+      },
+      "integrations": {
+        "name": "integrations",
+        "page_count": 7,
+        "depth": 3,
+        "parent": "changelog",
+        "subsections": [],
+        "url_pattern": "/integrations/*",
+        "importance": 34.449
+      },
+      "patterns": {
+        "name": "patterns",
+        "page_count": 5,
+        "depth": 3,
+        "parent": "changelog",
+        "subsections": [],
+        "url_pattern": "/patterns/*",
+        "importance": 24.931
+      },
+      "python-sdk": {
+        "name": "python-sdk",
+        "page_count": 60,
+        "depth": 3,
+        "parent": "changelog",
+        "subsections": [],
+        "url_pattern": "/python-sdk/*",
+        "importance": 1603.565
+      },
+      "servers": {
+        "name": "servers",
+        "page_count": 10,
+        "depth": 3,
+        "parent": "changelog",
+        "subsections": [],
+        "url_pattern": "/servers/*",
+        "importance": 54.5
+      },
+      "tutorials": {
+        "name": "tutorials",
+        "page_count": 3,
+        "depth": 3,
+        "parent": "changelog",
+        "subsections": [],
+        "url_pattern": "/tutorials/*",
+        "importance": 15.0
+      },
+      "updates": {
+        "name": "updates",
+        "page_count": 1,
+        "depth": 2,
+        "parent": null,
+        "subsections": [],
+        "url_pattern": "/updates/*",
+        "importance": 6.0
+      },
+      "llms.txt": {
+        "name": "llms.txt",
+        "page_count": 1,
+        "depth": 2,
+        "parent": null,
+        "subsections": [],
+        "url_pattern": "/llms.txt/*",
+        "importance": 7.0
+      },
+      "llms-full.txt": {
+        "name": "llms-full.txt",
+        "page_count": 1,
+        "depth": 2,
+        "parent": null,
+        "subsections": [],
+        "url_pattern": "/llms-full.txt/*",
+        "importance": 7.0
+      },
+      "home": {
+        "name": "home",
+        "page_count": 1,
+        "depth": 1,
+        "parent": null,
+        "subsections": [],
+        "url_pattern": "/",
+        "importance": 59.5
+      }
+    },
+    "navigation": {
+      "changelog": [
+        {
+          "url": "https://gofastmcp.com/changelog",
+          "title": "Changelog - FastMCP",
+          "importance": 6.0
+        }
+      ],
+      "clients": [
+        {
+          "url": "https://gofastmcp.com/clients/sampling",
+          "title": "LLM Sampling - FastMCP",
+          "importance": 6.0
+        },
+        {
+          "url": "https://gofastmcp.com/clients/prompts",
+          "title": "Prompts - FastMCP",
+          "importance": 5.5
+        },
+        {
+          "url": "https://gofastmcp.com/clients/resources",
+          "title": "Resource Operations - FastMCP",
+          "importance": 5.5
+        },
+        {
+          "url": "https://gofastmcp.com/clients/tools",
+          "title": "Tool Operations - FastMCP",
+          "importance": 5.5
+        },
+        {
+          "url": "https://gofastmcp.com/clients/transports",
+          "title": "Client Transports - FastMCP",
+          "importance": 5.5
+        }
+      ],
+      "community": [
+        {
+          "url": "https://gofastmcp.com/community/showcase",
+          "title": "Community Showcase - FastMCP",
+          "importance": 4.115
+        }
+      ],
+      "deployment": [
+        {
+          "url": "https://gofastmcp.com/deployment/asgi",
+          "title": "Integrating FastMCP in ASGI Applications - FastMCP",
+          "importance": 5.0
+        },
+        {
+          "url": "https://gofastmcp.com/deployment/running-server",
+          "title": "Running Your FastMCP Server - FastMCP",
+          "importance": 5.0
+        }
+      ],
+      "getting-started": [
+        {
+          "url": "https://gofastmcp.com/getting-started/welcome",
+          "title": "Welcome to FastMCP 2.0! - FastMCP",
+          "importance": 14.0
+        },
+        {
+          "url": "https://gofastmcp.com/getting-started/welcome.md",
+          "title": "https://gofastmcp.com/getting-started/welcome.md",
+          "importance": 6.0
+        },
+        {
+          "url": "https://gofastmcp.com/getting-started/installation",
+          "title": "Installation - FastMCP",
+          "importance": 5.0
+        },
+        {
+          "url": "https://gofastmcp.com/getting-started/quickstart",
+          "title": "Quickstart - FastMCP",
+          "importance": 5.0
+        }
+      ],
+      "integrations": [
+        {
+          "url": "https://gofastmcp.com/integrations/contrib",
+          "title": "Contrib Modules - FastMCP",
+          "importance": 5.0489999999999995
+        },
+        {
+          "url": "https://gofastmcp.com/integrations/anthropic",
+          "title": "Anthropic API + FastMCP - FastMCP",
+          "importance": 5.0
+        },
+        {
+          "url": "https://gofastmcp.com/integrations/chatgpt",
+          "title": "ChatGPT + FastMCP - FastMCP",
+          "importance": 5.0
+        },
+        {
+          "url": "https://gofastmcp.com/integrations/claude-desktop",
+          "title": "Claude Desktop + FastMCP - FastMCP",
+          "importance": 5.0
+        },
+        {
+          "url": "https://gofastmcp.com/integrations/gemini",
+          "title": "Gemini SDK + FastMCP - FastMCP",
+          "importance": 5.0
+        }
+      ],
+      "patterns": [
+        {
+          "url": "https://gofastmcp.com/patterns/cli",
+          "title": "FastMCP CLI - FastMCP",
+          "importance": 5.5
+        },
+        {
+          "url": "https://gofastmcp.com/patterns/tool-transformation",
+          "title": "Tool Transformation - FastMCP",
+          "importance": 5.5
+        },
+        {
+          "url": "https://gofastmcp.com/patterns/decorating-methods",
+          "title": "Decorating Methods - FastMCP",
+          "importance": 5.0
+        },
+        {
+          "url": "https://gofastmcp.com/patterns/http-requests",
+          "title": "HTTP Requests - FastMCP",
+          "importance": 5.0
+        },
+        {
+          "url": "https://gofastmcp.com/patterns/testing",
+          "title": "Testing MCP Servers - FastMCP",
+          "importance": 3.931
+        }
+      ],
+      "python-sdk": [
+        {
+          "url": "https://gofastmcp.com/python-sdk/fastmcp-utilities-types",
+          "title": "types - FastMCP",
+          "importance": 49.803
+        },
+        {
+          "url": "https://gofastmcp.com/python-sdk/fastmcp-utilities-openapi",
+          "title": "openapi - FastMCP",
+          "importance": 49.0
+        },
+        {
+          "url": "https://gofastmcp.com/python-sdk/fastmcp-utilities-tests",
+          "title": "tests - FastMCP",
+          "importance": 48.223
+        },
+        {
+          "url": "https://gofastmcp.com/python-sdk/fastmcp-utilities-mcp_config",
+          "title": "mcp_config - FastMCP",
+          "importance": 46.952
+        },
+        {
+          "url": "https://gofastmcp.com/python-sdk/fastmcp-utilities-logging",
+          "title": "logging - FastMCP",
+          "importance": 46.432
+        }
+      ],
+      "servers": [
+        {
+          "url": "https://gofastmcp.com/servers/tools",
+          "title": "Tools - FastMCP",
+          "importance": 6.5
+        },
+        {
+          "url": "https://gofastmcp.com/servers/proxy",
+          "title": "Proxy Servers - FastMCP",
+          "importance": 6.0
+        },
+        {
+          "url": "https://gofastmcp.com/servers/composition",
+          "title": "Server Composition - FastMCP",
+          "importance": 5.5
+        },
+        {
+          "url": "https://gofastmcp.com/servers/openapi",
+          "title": "OpenAPI Integration - FastMCP",
+          "importance": 5.5
+        },
+        {
+          "url": "https://gofastmcp.com/servers/prompts",
+          "title": "Prompts - FastMCP",
+          "importance": 5.5
+        }
+      ],
+      "tutorials": [
+        {
+          "url": "https://gofastmcp.com/tutorials/create-mcp-server",
+          "title": "How to Create an MCP Server in Python - FastMCP",
+          "importance": 5.0
+        },
+        {
+          "url": "https://gofastmcp.com/tutorials/mcp",
+          "title": "What is the Model Context Protocol (MCP)? - FastMCP",
+          "importance": 5.0
+        },
+        {
+          "url": "https://gofastmcp.com/tutorials/rest-api",
+          "title": "How to Connect an LLM to a REST API - FastMCP",
+          "importance": 5.0
+        }
+      ],
+      "updates": [
+        {
+          "url": "https://gofastmcp.com/updates",
+          "title": "FastMCP Updates - FastMCP",
+          "importance": 6.0
+        }
+      ],
+      "llms.txt": [
+        {
+          "url": "https://gofastmcp.com/llms.txt",
+          "title": "https://gofastmcp.com/llms.txt",
+          "importance": 7.0
+        }
+      ],
+      "llms-full.txt": [
+        {
+          "url": "https://gofastmcp.com/llms-full.txt",
+          "title": "https://gofastmcp.com/llms-full.txt",
+          "importance": 7.0
+        }
+      ],
+      "home": [
+        {
+          "url": "https://gofastmcp.com/",
+          "title": "Welcome to FastMCP 2.0! - FastMCP",
+          "importance": 59.5
+        }
+      ]
+    },
+    "total_pages": 109,
+    "total_sections": 14,
+    "graph_metrics": {
+      "density": 0.24770642201834864,
+      "average_clustering": 0.8274771198720932,
+      "number_of_components": 1
+    }
+  },
+  "intent_analysis": {
+    "discovered_intents": [
+      {
+        "primary_intent": "implement_and_integrate",
+        "user_goal": "implement solution with API integration",
+        "confidence": 1.0,
+        "keywords": [
+          "deployment",
+          "settings",
+          "implement",
+          "configure",
+          "integrate",
+          "installation",
+          "export",
+          "sync",
+          "api",
+          "documentation"
+        ],
+        "action_verbs": [],
+        "pain_points": [
+          "routes. For advanced use cases that require more complex logic, you can provide a route_map_fn callable. A",
+          "ion types can be nested and combined to represent complex data structures. JSON strings that match the expe",
+          "lass UserData name str age int async with client  Complex arguments are automatically serialized result  aw",
+          "r - start_time  1000 printfRequest context.method failed after duration_ms.2fms e raise To use the full ve",
+          "in version 2.9.0 FastMCP automatically serializes complex arguments to JSON strings as required by the MCP"
+        ],
+        "page_count": 47,
+        "extraction_method": "user_intent_analysis",
+        "pages": [
+          "https://gofastmcp.com/clients/auth/bearer",
+          "https://gofastmcp.com/clients/auth/oauth",
+          "https://gofastmcp.com/clients/client",
+          "https://gofastmcp.com/clients/prompts",
+          "https://gofastmcp.com/clients/resources",
+          "https://gofastmcp.com/clients/sampling",
+          "https://gofastmcp.com/clients/transports",
+          "https://gofastmcp.com/deployment/asgi",
+          "https://gofastmcp.com/getting-started/installation",
+          "https://gofastmcp.com/getting-started/welcome",
+          "https://gofastmcp.com/integrations/anthropic",
+          "https://gofastmcp.com/integrations/chatgpt",
+          "https://gofastmcp.com/integrations/claude-code",
+          "https://gofastmcp.com/integrations/claude-desktop",
+          "https://gofastmcp.com/integrations/gemini",
+          "https://gofastmcp.com/integrations/openai",
+          "https://gofastmcp.com/patterns/cli",
+          "https://gofastmcp.com/python-sdk/fastmcp-cli-__init__",
+          "https://gofastmcp.com/python-sdk/fastmcp-cli-claude",
+          "https://gofastmcp.com/python-sdk/fastmcp-cli-run",
+          "https://gofastmcp.com/python-sdk/fastmcp-client-__init__",
+          "https://gofastmcp.com/python-sdk/fastmcp-client-auth-__init__",
+          "https://gofastmcp.com/python-sdk/fastmcp-client-auth-bearer",
+          "https://gofastmcp.com/python-sdk/fastmcp-client-oauth_callback",
+          "https://gofastmcp.com/python-sdk/fastmcp-client-progress",
+          "https://gofastmcp.com/python-sdk/fastmcp-prompts-__init__",
+          "https://gofastmcp.com/python-sdk/fastmcp-resources-__init__",
+          "https://gofastmcp.com/python-sdk/fastmcp-server-__init__",
+          "https://gofastmcp.com/python-sdk/fastmcp-server-auth-__init__",
+          "https://gofastmcp.com/python-sdk/fastmcp-server-auth-auth",
+          "https://gofastmcp.com/python-sdk/fastmcp-server-auth-providers-bearer_env",
+          "https://gofastmcp.com/python-sdk/fastmcp-server-middleware-__init__",
+          "https://gofastmcp.com/python-sdk/fastmcp-server-openapi",
+          "https://gofastmcp.com/python-sdk/fastmcp-settings",
+          "https://gofastmcp.com/python-sdk/fastmcp-tools-__init__",
+          "https://gofastmcp.com/python-sdk/fastmcp-utilities-__init__",
+          "https://gofastmcp.com/python-sdk/fastmcp-utilities-logging",
+          "https://gofastmcp.com/python-sdk/fastmcp-utilities-tests",
+          "https://gofastmcp.com/servers/auth/bearer",
+          "https://gofastmcp.com/servers/composition",
+          "https://gofastmcp.com/servers/middleware",
+          "https://gofastmcp.com/servers/openapi",
+          "https://gofastmcp.com/servers/proxy",
+          "https://gofastmcp.com/servers/tools",
+          "https://gofastmcp.com/tutorials/rest-api",
+          "https://gofastmcp.com/",
+          "https://gofastmcp.com/llms-full.txt"
+        ],
+        "evidence": {
+          "signal_frequency": 1480,
+          "action_count": 0,
+          "pain_point_count": 21
+        }
+      },
+      {
+        "primary_intent": "connect_and_communicate",
+        "user_goal": "get human help",
+        "confidence": 1.0,
+        "keywords": [
+          "request",
+          "help",
+          "team",
+          "expert",
+          "report",
+          "network",
+          "community",
+          "support"
+        ],
+        "action_verbs": [],
+        "pain_points": [
+          "st except Exception as e await ctx.errorfAnalysis failed stre raise Available Logging Methods ctx.debugmes",
+          "e string, its treated as a user message. For more complex scenarios, you can provide a list of messages wit"
+        ],
+        "page_count": 9,
+        "extraction_method": "user_intent_analysis",
+        "pages": [
+          "https://gofastmcp.com/integrations/contrib",
+          "https://gofastmcp.com/patterns/http-requests",
+          "https://gofastmcp.com/python-sdk/fastmcp-cli-cli",
+          "https://gofastmcp.com/python-sdk/fastmcp-client-auth-oauth",
+          "https://gofastmcp.com/python-sdk/fastmcp-server-context",
+          "https://gofastmcp.com/python-sdk/fastmcp-server-dependencies",
+          "https://gofastmcp.com/python-sdk/fastmcp-utilities-openapi",
+          "https://gofastmcp.com/servers/context",
+          "https://gofastmcp.com/servers/resources"
+        ],
+        "evidence": {
+          "signal_frequency": 116,
+          "action_count": 0,
+          "pain_point_count": 2
+        }
+      },
+      {
+        "primary_intent": "stay_informed",
+        "user_goal": "stay current",
+        "confidence": 1.0,
+        "keywords": [
+          "new feature",
+          "updates",
+          "changelog",
+          "notifications",
+          "new features",
+          "release",
+          "releases",
+          "industry"
+        ],
+        "action_verbs": [],
+        "pain_points": [
+          "The wildcard URI templates exposed in v2.2.3 were blocked by a server-level check which is removed in this",
+          "s release is highlighted by the ability to handle complex JSON objects as MCP inputs and improved Windows c",
+          "c tools for specific LLM use cases or to simplify complex APIs. Huge thanks to strawgate for partnering on"
+        ],
+        "page_count": 4,
+        "extraction_method": "user_intent_analysis",
+        "pages": [
+          "https://gofastmcp.com/changelog",
+          "https://gofastmcp.com/clients/messages",
+          "https://gofastmcp.com/clients/progress",
+          "https://gofastmcp.com/updates"
+        ],
+        "evidence": {
+          "signal_frequency": 84,
+          "action_count": 0,
+          "pain_point_count": 3
+        }
+      },
+      {
+        "primary_intent": "learn_and_understand",
+        "user_goal": "acquire new skills through step-by-step guidance",
+        "confidence": 0.8819444444444445,
+        "keywords": [
+          "what is",
+          "example",
+          "introduction",
+          "best practices",
+          "examples",
+          "understand",
+          "best practice",
+          "how to",
+          "tutorial",
+          "guide"
+        ],
+        "action_verbs": [],
+        "pain_points": [
+          "se managing an MCP server programmatically can be challenging. Here is an example of using a Client to test a s",
+          "t names. This is rarely needed unless youre doing complex argument manipulation, perhaps without arg_transf",
+          "MCP provides the run_async method. The run method cannot be called from inside an async function because i",
+          "fications to a client. These features enable more complex, bidirectional workflows and are fully supported",
+          "for a new transformation. This lets you build up complex behaviors in layers, for example, first renaming"
+        ],
+        "page_count": 12,
+        "extraction_method": "user_intent_analysis",
+        "pages": [
+          "https://gofastmcp.com/community/showcase",
+          "https://gofastmcp.com/deployment/running-server",
+          "https://gofastmcp.com/getting-started/quickstart",
+          "https://gofastmcp.com/patterns/decorating-methods",
+          "https://gofastmcp.com/patterns/testing",
+          "https://gofastmcp.com/patterns/tool-transformation",
+          "https://gofastmcp.com/python-sdk/fastmcp-client-transports",
+          "https://gofastmcp.com/python-sdk/fastmcp-server-server",
+          "https://gofastmcp.com/python-sdk/fastmcp-tools-tool_transform",
+          "https://gofastmcp.com/servers/server",
+          "https://gofastmcp.com/tutorials/create-mcp-server",
+          "https://gofastmcp.com/tutorials/mcp"
+        ],
+        "evidence": {
+          "signal_frequency": 106,
+          "action_count": 0,
+          "pain_point_count": 9
+        }
+      },
+      {
+        "primary_intent": "solve_problem",
+        "user_goal": "fix issues",
+        "confidence": 0.6720000000000002,
+        "keywords": [
+          "failed",
+          "error",
+          "help"
+        ],
+        "action_verbs": [],
+        "pain_points": [
+          "ons for better developer experience. When you use complex types like listint or dictstr, str , FastMCP Sinc",
+          "dleware that implements automatic retry logic for failed requests. Retries requests that fail with transie",
+          "types.CallToolResult if result.isError printfTool failed result.content else printfTool succeeded result.c",
+          "ucceeded, result except ToolError as e printfTool failed e Manual Error Checking For more granular control",
+          "lients need to know what string format to use for complex types. FastMCP solves this by automatically enhan"
+        ],
+        "page_count": 5,
+        "extraction_method": "user_intent_analysis",
+        "pages": [
+          "https://gofastmcp.com/clients/tools",
+          "https://gofastmcp.com/python-sdk/fastmcp-exceptions",
+          "https://gofastmcp.com/python-sdk/fastmcp-server-middleware-error_handling",
+          "https://gofastmcp.com/python-sdk/fastmcp-server-middleware-rate_limiting",
+          "https://gofastmcp.com/servers/prompts"
+        ],
+        "evidence": {
+          "signal_frequency": 36,
+          "action_count": 0,
+          "pain_point_count": 8
+        }
+      },
+      {
+        "primary_intent": "evaluate_and_purchase",
+        "user_goal": "evaluate cost while understanding costs",
+        "confidence": 0.35,
+        "keywords": [
+          "specification",
+          "capabilities",
+          "cost"
+        ],
+        "action_verbs": [],
+        "pain_points": [],
+        "page_count": 2,
+        "extraction_method": "user_intent_analysis",
+        "pages": [
+          "https://gofastmcp.com/python-sdk/fastmcp-client-client",
+          "https://gofastmcp.com/python-sdk/fastmcp-utilities-types"
+        ],
+        "evidence": {
+          "signal_frequency": 5,
+          "action_count": 0,
+          "pain_point_count": 0
+        }
+      },
+      {
+        "primary_intent": "optimize_and_improve",
+        "user_goal": "improve performance",
+        "confidence": 0.175,
+        "keywords": [
+          "better",
+          "performance"
+        ],
+        "action_verbs": [],
+        "pain_points": [],
+        "page_count": 2,
+        "extraction_method": "user_intent_analysis",
+        "pages": [
+          "https://gofastmcp.com/python-sdk/fastmcp-server-middleware-logging",
+          "https://gofastmcp.com/python-sdk/fastmcp-server-middleware-timing"
+        ],
+        "evidence": {
+          "signal_frequency": 7,
+          "action_count": 0,
+          "pain_point_count": 0
+        }
+      }
+    ],
+    "by_section": {
+      "Clients": [
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/clients/auth/bearer",
+          "page_title": "Bearer Token Authentication - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/clients/auth/oauth",
+          "page_title": "OAuth Authentication - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/clients/client",
+          "page_title": "The FastMCP Client - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/clients/prompts",
+          "page_title": "Prompts - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/clients/resources",
+          "page_title": "Resource Operations - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/clients/sampling",
+          "page_title": "LLM Sampling - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/clients/transports",
+          "page_title": "Client Transports - FastMCP"
+        },
+        {
+          "intent": "stay_informed",
+          "user_goal": "stay current",
+          "confidence": 1.0,
+          "keywords": [
+            "new feature",
+            "updates",
+            "changelog",
+            "notifications",
+            "new features"
+          ],
+          "page_url": "https://gofastmcp.com/clients/messages",
+          "page_title": "Message Handling - FastMCP"
+        },
+        {
+          "intent": "stay_informed",
+          "user_goal": "stay current",
+          "confidence": 1.0,
+          "keywords": [
+            "new feature",
+            "updates",
+            "changelog",
+            "notifications",
+            "new features"
+          ],
+          "page_url": "https://gofastmcp.com/clients/progress",
+          "page_title": "Progress Monitoring - FastMCP"
+        },
+        {
+          "intent": "solve_problem",
+          "user_goal": "fix issues",
+          "confidence": 0.6720000000000002,
+          "keywords": [
+            "failed",
+            "error",
+            "help"
+          ],
+          "page_url": "https://gofastmcp.com/clients/tools",
+          "page_title": "Tool Operations - FastMCP"
+        }
+      ],
+      "Deployment": [
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/deployment/asgi",
+          "page_title": "Integrating FastMCP in ASGI Applications - FastMCP"
+        },
+        {
+          "intent": "learn_and_understand",
+          "user_goal": "acquire new skills through step-by-step guidance",
+          "confidence": 0.8819444444444445,
+          "keywords": [
+            "what is",
+            "example",
+            "introduction",
+            "best practices",
+            "examples"
+          ],
+          "page_url": "https://gofastmcp.com/deployment/running-server",
+          "page_title": "Running Your FastMCP Server - FastMCP"
+        }
+      ],
+      "Getting Started": [
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/getting-started/installation",
+          "page_title": "Installation - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/getting-started/welcome",
+          "page_title": "Welcome to FastMCP 2.0! - FastMCP"
+        },
+        {
+          "intent": "learn_and_understand",
+          "user_goal": "acquire new skills through step-by-step guidance",
+          "confidence": 0.8819444444444445,
+          "keywords": [
+            "what is",
+            "example",
+            "introduction",
+            "best practices",
+            "examples"
+          ],
+          "page_url": "https://gofastmcp.com/getting-started/quickstart",
+          "page_title": "Quickstart - FastMCP"
+        }
+      ],
+      "Integrations": [
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/integrations/anthropic",
+          "page_title": "Anthropic API + FastMCP - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/integrations/chatgpt",
+          "page_title": "ChatGPT + FastMCP - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/integrations/claude-code",
+          "page_title": "Claude Code + FastMCP - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/integrations/claude-desktop",
+          "page_title": "Claude Desktop + FastMCP - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/integrations/gemini",
+          "page_title": "Gemini SDK + FastMCP - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/integrations/openai",
+          "page_title": "OpenAI API + FastMCP - FastMCP"
+        },
+        {
+          "intent": "connect_and_communicate",
+          "user_goal": "get human help",
+          "confidence": 1.0,
+          "keywords": [
+            "request",
+            "help",
+            "team",
+            "expert",
+            "report"
+          ],
+          "page_url": "https://gofastmcp.com/integrations/contrib",
+          "page_title": "Contrib Modules - FastMCP"
+        }
+      ],
+      "Patterns": [
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/patterns/cli",
+          "page_title": "FastMCP CLI - FastMCP"
+        },
+        {
+          "intent": "connect_and_communicate",
+          "user_goal": "get human help",
+          "confidence": 1.0,
+          "keywords": [
+            "request",
+            "help",
+            "team",
+            "expert",
+            "report"
+          ],
+          "page_url": "https://gofastmcp.com/patterns/http-requests",
+          "page_title": "HTTP Requests - FastMCP"
+        },
+        {
+          "intent": "learn_and_understand",
+          "user_goal": "acquire new skills through step-by-step guidance",
+          "confidence": 0.8819444444444445,
+          "keywords": [
+            "what is",
+            "example",
+            "introduction",
+            "best practices",
+            "examples"
+          ],
+          "page_url": "https://gofastmcp.com/patterns/decorating-methods",
+          "page_title": "Decorating Methods - FastMCP"
+        },
+        {
+          "intent": "learn_and_understand",
+          "user_goal": "acquire new skills through step-by-step guidance",
+          "confidence": 0.8819444444444445,
+          "keywords": [
+            "what is",
+            "example",
+            "introduction",
+            "best practices",
+            "examples"
+          ],
+          "page_url": "https://gofastmcp.com/patterns/testing",
+          "page_title": "Testing MCP Servers - FastMCP"
+        },
+        {
+          "intent": "learn_and_understand",
+          "user_goal": "acquire new skills through step-by-step guidance",
+          "confidence": 0.8819444444444445,
+          "keywords": [
+            "what is",
+            "example",
+            "introduction",
+            "best practices",
+            "examples"
+          ],
+          "page_url": "https://gofastmcp.com/patterns/tool-transformation",
+          "page_title": "Tool Transformation - FastMCP"
+        }
+      ],
+      "Python Sdk": [
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-cli-__init__",
+          "page_title": "__init__ - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-cli-claude",
+          "page_title": "claude - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-cli-run",
+          "page_title": "run - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-client-__init__",
+          "page_title": "__init__ - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-client-auth-__init__",
+          "page_title": "__init__ - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-client-auth-bearer",
+          "page_title": "bearer - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-client-oauth_callback",
+          "page_title": "oauth_callback - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-client-progress",
+          "page_title": "progress - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-prompts-__init__",
+          "page_title": "__init__ - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-resources-__init__",
+          "page_title": "__init__ - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-server-__init__",
+          "page_title": "__init__ - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-server-auth-__init__",
+          "page_title": "__init__ - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-server-auth-auth",
+          "page_title": "auth - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-server-auth-providers-bearer_env",
+          "page_title": "bearer_env - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-server-middleware-__init__",
+          "page_title": "__init__ - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-server-openapi",
+          "page_title": "openapi - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-settings",
+          "page_title": "settings - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-tools-__init__",
+          "page_title": "__init__ - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-utilities-__init__",
+          "page_title": "__init__ - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-utilities-logging",
+          "page_title": "logging - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-utilities-tests",
+          "page_title": "tests - FastMCP"
+        },
+        {
+          "intent": "connect_and_communicate",
+          "user_goal": "get human help",
+          "confidence": 1.0,
+          "keywords": [
+            "request",
+            "help",
+            "team",
+            "expert",
+            "report"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-cli-cli",
+          "page_title": "cli - FastMCP"
+        },
+        {
+          "intent": "connect_and_communicate",
+          "user_goal": "get human help",
+          "confidence": 1.0,
+          "keywords": [
+            "request",
+            "help",
+            "team",
+            "expert",
+            "report"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-client-auth-oauth",
+          "page_title": "oauth - FastMCP"
+        },
+        {
+          "intent": "connect_and_communicate",
+          "user_goal": "get human help",
+          "confidence": 1.0,
+          "keywords": [
+            "request",
+            "help",
+            "team",
+            "expert",
+            "report"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-server-context",
+          "page_title": "context - FastMCP"
+        },
+        {
+          "intent": "connect_and_communicate",
+          "user_goal": "get human help",
+          "confidence": 1.0,
+          "keywords": [
+            "request",
+            "help",
+            "team",
+            "expert",
+            "report"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-server-dependencies",
+          "page_title": "dependencies - FastMCP"
+        },
+        {
+          "intent": "connect_and_communicate",
+          "user_goal": "get human help",
+          "confidence": 1.0,
+          "keywords": [
+            "request",
+            "help",
+            "team",
+            "expert",
+            "report"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-utilities-openapi",
+          "page_title": "openapi - FastMCP"
+        },
+        {
+          "intent": "learn_and_understand",
+          "user_goal": "acquire new skills through step-by-step guidance",
+          "confidence": 0.8819444444444445,
+          "keywords": [
+            "what is",
+            "example",
+            "introduction",
+            "best practices",
+            "examples"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-client-transports",
+          "page_title": "transports - FastMCP"
+        },
+        {
+          "intent": "learn_and_understand",
+          "user_goal": "acquire new skills through step-by-step guidance",
+          "confidence": 0.8819444444444445,
+          "keywords": [
+            "what is",
+            "example",
+            "introduction",
+            "best practices",
+            "examples"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-server-server",
+          "page_title": "server - FastMCP"
+        },
+        {
+          "intent": "learn_and_understand",
+          "user_goal": "acquire new skills through step-by-step guidance",
+          "confidence": 0.8819444444444445,
+          "keywords": [
+            "what is",
+            "example",
+            "introduction",
+            "best practices",
+            "examples"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-tools-tool_transform",
+          "page_title": "tool_transform - FastMCP"
+        },
+        {
+          "intent": "solve_problem",
+          "user_goal": "fix issues",
+          "confidence": 0.6720000000000002,
+          "keywords": [
+            "failed",
+            "error",
+            "help"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-exceptions",
+          "page_title": "exceptions - FastMCP"
+        },
+        {
+          "intent": "solve_problem",
+          "user_goal": "fix issues",
+          "confidence": 0.6720000000000002,
+          "keywords": [
+            "failed",
+            "error",
+            "help"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-server-middleware-error_handling",
+          "page_title": "error_handling - FastMCP"
+        },
+        {
+          "intent": "solve_problem",
+          "user_goal": "fix issues",
+          "confidence": 0.6720000000000002,
+          "keywords": [
+            "failed",
+            "error",
+            "help"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-server-middleware-rate_limiting",
+          "page_title": "rate_limiting - FastMCP"
+        },
+        {
+          "intent": "evaluate_and_purchase",
+          "user_goal": "evaluate cost while understanding costs",
+          "confidence": 0.35,
+          "keywords": [
+            "specification",
+            "capabilities",
+            "cost"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-client-client",
+          "page_title": "client - FastMCP"
+        },
+        {
+          "intent": "evaluate_and_purchase",
+          "user_goal": "evaluate cost while understanding costs",
+          "confidence": 0.35,
+          "keywords": [
+            "specification",
+            "capabilities",
+            "cost"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-utilities-types",
+          "page_title": "types - FastMCP"
+        },
+        {
+          "intent": "optimize_and_improve",
+          "user_goal": "improve performance",
+          "confidence": 0.175,
+          "keywords": [
+            "better",
+            "performance"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-server-middleware-logging",
+          "page_title": "logging - FastMCP"
+        },
+        {
+          "intent": "optimize_and_improve",
+          "user_goal": "improve performance",
+          "confidence": 0.175,
+          "keywords": [
+            "better",
+            "performance"
+          ],
+          "page_url": "https://gofastmcp.com/python-sdk/fastmcp-server-middleware-timing",
+          "page_title": "timing - FastMCP"
+        }
+      ],
+      "Servers": [
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/servers/auth/bearer",
+          "page_title": "Bearer Token Authentication - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/servers/composition",
+          "page_title": "Server Composition - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/servers/middleware",
+          "page_title": "MCP Middleware - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/servers/openapi",
+          "page_title": "OpenAPI Integration - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/servers/proxy",
+          "page_title": "Proxy Servers - FastMCP"
+        },
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/servers/tools",
+          "page_title": "Tools - FastMCP"
+        },
+        {
+          "intent": "connect_and_communicate",
+          "user_goal": "get human help",
+          "confidence": 1.0,
+          "keywords": [
+            "request",
+            "help",
+            "team",
+            "expert",
+            "report"
+          ],
+          "page_url": "https://gofastmcp.com/servers/context",
+          "page_title": "MCP Context - FastMCP"
+        },
+        {
+          "intent": "connect_and_communicate",
+          "user_goal": "get human help",
+          "confidence": 1.0,
+          "keywords": [
+            "request",
+            "help",
+            "team",
+            "expert",
+            "report"
+          ],
+          "page_url": "https://gofastmcp.com/servers/resources",
+          "page_title": "Resources & Templates - FastMCP"
+        },
+        {
+          "intent": "learn_and_understand",
+          "user_goal": "acquire new skills through step-by-step guidance",
+          "confidence": 0.8819444444444445,
+          "keywords": [
+            "what is",
+            "example",
+            "introduction",
+            "best practices",
+            "examples"
+          ],
+          "page_url": "https://gofastmcp.com/servers/server",
+          "page_title": "The FastMCP Server - FastMCP"
+        },
+        {
+          "intent": "solve_problem",
+          "user_goal": "fix issues",
+          "confidence": 0.6720000000000002,
+          "keywords": [
+            "failed",
+            "error",
+            "help"
+          ],
+          "page_url": "https://gofastmcp.com/servers/prompts",
+          "page_title": "Prompts - FastMCP"
+        }
+      ],
+      "Tutorials": [
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/tutorials/rest-api",
+          "page_title": "How to Connect an LLM to a REST API - FastMCP"
+        },
+        {
+          "intent": "learn_and_understand",
+          "user_goal": "acquire new skills through step-by-step guidance",
+          "confidence": 0.8819444444444445,
+          "keywords": [
+            "what is",
+            "example",
+            "introduction",
+            "best practices",
+            "examples"
+          ],
+          "page_url": "https://gofastmcp.com/tutorials/create-mcp-server",
+          "page_title": "How to Create an MCP Server in Python - FastMCP"
+        },
+        {
+          "intent": "learn_and_understand",
+          "user_goal": "acquire new skills through step-by-step guidance",
+          "confidence": 0.8819444444444445,
+          "keywords": [
+            "what is",
+            "example",
+            "introduction",
+            "best practices",
+            "examples"
+          ],
+          "page_url": "https://gofastmcp.com/tutorials/mcp",
+          "page_title": "What is the Model Context Protocol (MCP)? - FastMCP"
+        }
+      ],
+      "home": [
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/",
+          "page_title": "Welcome to FastMCP 2.0! - FastMCP"
+        }
+      ],
+      "Llms Full.Txt": [
+        {
+          "intent": "implement_and_integrate",
+          "user_goal": "implement solution with API integration",
+          "confidence": 1.0,
+          "keywords": [
+            "deployment",
+            "settings",
+            "implement",
+            "configure",
+            "integrate"
+          ],
+          "page_url": "https://gofastmcp.com/llms-full.txt",
+          "page_title": "https://gofastmcp.com/llms-full.txt"
+        }
+      ],
+      "Changelog": [
+        {
+          "intent": "stay_informed",
+          "user_goal": "stay current",
+          "confidence": 1.0,
+          "keywords": [
+            "new feature",
+            "updates",
+            "changelog",
+            "notifications",
+            "new features"
+          ],
+          "page_url": "https://gofastmcp.com/changelog",
+          "page_title": "Changelog - FastMCP"
+        }
+      ],
+      "Updates": [
+        {
+          "intent": "stay_informed",
+          "user_goal": "stay current",
+          "confidence": 1.0,
+          "keywords": [
+            "new feature",
+            "updates",
+            "changelog",
+            "notifications",
+            "new features"
+          ],
+          "page_url": "https://gofastmcp.com/updates",
+          "page_title": "FastMCP Updates - FastMCP"
+        }
+      ],
+      "Community": [
+        {
+          "intent": "learn_and_understand",
+          "user_goal": "acquire new skills through step-by-step guidance",
+          "confidence": 0.8819444444444445,
+          "keywords": [
+            "what is",
+            "example",
+            "introduction",
+            "best practices",
+            "examples"
+          ],
+          "page_url": "https://gofastmcp.com/community/showcase",
+          "page_title": "Community Showcase - FastMCP"
+        }
+      ]
+    },
+    "total_intents_discovered": 7,
+    "extraction_methods_used": [
+      "user_intent_analysis"
+    ]
+  },
+  "llmstxt_content": "# Gofastmcp\n\n--- title Welcome to FastMCP 2 - FastMCP description The fast, Pythonic way to build MCP servers and clients sitename FastMCP date 2024-05-29 --- The fast, Pythonic way to build MCP servers and clients The Model Context Protocol MCP is a new, standardized way to provide context and tools to your LLMs, and FastMCP makes building MCP servers and clients simple and intuitive\n\n## Changelog\n\n- [Changelog - FastMCP](https://gofastmcp.com/changelog): --- title Changelog - FastMCP sitename FastMCP date 2010-02-02 --- FastMCP 2 9 introduces two important features that push beyond the basic MCP protocol MCP Middleware and server-side type conversion MCP middleware lets you intercept and modify requests and responses at the protocol level, giving you powerful capabilities for logging, authentication, validation, and more This is particularly useful for building production-ready MCP servers that need sophisticated request handling\n\n## Clients\n\n- [Bearer Token Authentication - FastMCP](https://gofastmcp.com/clients/auth/bearer): --- title Bearer Token Authentication - FastMCP description Authenticate your FastMCP client with a Bearer token sitename FastMCP date 2024-05-29 --- Authenticate your FastMCP client with a Bearer token 0 Bearer Token authentication is only relevant for HTTP-based transports You can configure your FastMCP client to use bearer authentication by supplying a valid access token\n- [OAuth Authentication - FastMCP](https://gofastmcp.com/clients/auth/oauth): --- title OAuth Authentication - FastMCP description Authenticate your FastMCP client via OAuth 2 sitename FastMCP date 2024-05-29 --- Authenticate your FastMCP client via OAuth 2 0 OAuth authentication is only relevant for HTTP-based transports and requires user interaction via a web browser When your FastMCP client needs to access an MCP server protected by OAuth 2 1, and the process requires user interaction like logging in and granting consent, you should use the Authorization Code Flow\n- [The FastMCP Client - FastMCP](https://gofastmcp.com/clients/client): --- title The FastMCP Client - FastMCP description Programmatic client for interacting with MCP servers through a well-typed, Pythonic interface sitename FastMCP date 2024-05-29 --- New in version 2 0 The central piece of MCP client applications is the fastmcp This class provides a programmatic interface for interacting with any Model Context Protocol MCP server, handling protocol details and connection management automatically\n- [Server Logging - FastMCP](https://gofastmcp.com/clients/logging): --- title Server Logging - FastMCP description Receive and handle log messages from MCP servers sitename FastMCP date 2024-05-29 --- If you dont provide a custom log_handler, FastMCP uses a default handler that emits a DEBUG-level FastMCP log for every log message received from the server, which is useful for visibility without polluting your own logs Copy Ask AI client  Clientmy_mcp_server pyasync with client  Server logs will be emitted at DEBUG level automatically await client\n- [Message Handling - FastMCP](https://gofastmcp.com/clients/messages): --- title Message Handling - FastMCP description Handle MCP messages, requests, and notifications with custom message handlers sitename FastMCP date 2024-05-29 --- Handle MCP messages, requests, and notifications with custom message handlers 1 MCP clients can receive various types of messages from servers, including requests that need responses and notifications that dont The message handler provides a unified way to process all these messages\n- [Progress Monitoring - FastMCP](https://gofastmcp.com/clients/progress): --- title Progress Monitoring - FastMCP description Handle progress notifications from long-running server operations sitename FastMCP date 2024-05-29 --- Override the progress handler for specific tool calls Copy Ask AI async with client  Override with specific progress handler for this call result  await client call_tool long_running_task, param value, progress_handlermy_progress_handler  Assistant Responses are generated using AI and may contain mistakes\n- [Prompts - FastMCP](https://gofastmcp.com/clients/prompts): --- title Prompts - FastMCP description Use server-side prompt templates with automatic argument serialization sitename FastMCP date 2024-05-29 --- New in version 2 0 Prompts are reusable message templates exposed by MCP servers They can accept arguments to generate personalized message sequences for LLM interactions Listing Prompts Use list_prompts to retrieve all available prompt templates async with client prompts  await client list_prompts  prompts - listmcp\n- [Resource Operations - FastMCP](https://gofastmcp.com/clients/resources): --- title Resource Operations - FastMCP description Access static and templated resources from MCP servers sitename FastMCP date 2024-05-29 --- New in version 2 0 Resources are data sources exposed by MCP servers They can be static files or dynamic templates that generate content based on parameters Types of Resources MCP servers expose two types of resources - Static Resources Fixed content accessible via URI e\n- [Client Roots - FastMCP](https://gofastmcp.com/clients/roots): --- title Client Roots - FastMCP description Provide local context and resource boundaries to MCP servers sitename FastMCP date 2024-05-29 --- Provide local context and resource boundaries to MCP servers 0 Roots are a way for clients to inform servers about the resources they have access to Servers can use this information to adjust behavior or provide more relevant responses Provide a list of roots when creating the client\n- [LLM Sampling - FastMCP](https://gofastmcp.com/clients/sampling): --- title LLM Sampling - FastMCP description Handle server-initiated LLM sampling requests sitename FastMCP date 2024-05-29 --- Handle server-initiated LLM sampling requests 0 MCP servers can request LLM completions from clients The client handles these requests through a sampling handler callback Provide a sampling_handler function when creating the client from fastmcp import Client from fastmcp\n\n## Community\n\n- [Community Showcase - FastMCP](https://gofastmcp.com/community/showcase): --- title Community Showcase - FastMCP description High-quality projects and examples from the FastMCP community sitename FastMCP date 2024-05-29 --- High-quality projects and examples from the FastMCP community Discover exemplary MCP servers and implementations created by our community These projects demonstrate best practices and innovative uses of FastMCP\n\n## Deployment\n\n- [Integrating FastMCP in ASGI Applications - FastMCP](https://gofastmcp.com/deployment/asgi): --- title Integrating FastMCP in ASGI Applications - FastMCP description Integrate FastMCP servers into existing Starlette, FastAPI, or other ASGI applications sitename FastMCP date 2024-05-29 --- Integrate FastMCP servers into existing Starlette, FastAPI, or other ASGI applications While FastMCP provides standalone server capabilities, you can also integrate your FastMCP server into existing web applications\n- [Running Your FastMCP Server - FastMCP](https://gofastmcp.com/deployment/running-server): --- title Running Your FastMCP Server - FastMCP description Learn how to run and deploy your FastMCP server using various transport protocols like STDIO, Streamable HTTP, and SSE sitename FastMCP date 2024-05-29 --- Learn how to run and deploy your FastMCP server using various transport protocols like STDIO, Streamable HTTP, and SSE FastMCP servers can be run in different ways depending on your applications needs, from local command-line tools to persistent web services\n\n## Getting-Started\n\n- [Installation - FastMCP](https://gofastmcp.com/getting-started/installation): --- title Installation - FastMCP sitename FastMCP date 2024-05-29 --- We recommend using uv to install and manage FastMCP If you plan to use FastMCP in your project, you can add it as a dependency with Alternatively, you can install it directly with pip or uv pip  To verify that FastMCP is installed correctly, you can run the following command You should see output like the following Upgrading from the official MCP SDKs FastMCP 1 0 is generally straightforward\n- [Quickstart - FastMCP](https://gofastmcp.com/getting-started/quickstart): --- title Quickstart - FastMCP sitename FastMCP date 2024-05-29 --- Welcome This guide will help you quickly set up FastMCP and run your first MCP server If you havent already installed FastMCP, follow the installation instructions A FastMCP server is a collection of tools, resources, and other MCP components To create a server, start by instantiating the FastMCP class Create a new file called my_server py and add the following code Thats it\n- [Welcome to FastMCP 2.0! - FastMCP](https://gofastmcp.com/getting-started/welcome): --- title Welcome to FastMCP 2 - FastMCP description The fast, Pythonic way to build MCP servers and clients sitename FastMCP date 2024-05-29 --- The fast, Pythonic way to build MCP servers and clients The Model Context Protocol MCP is a new, standardized way to provide context and tools to your LLMs, and FastMCP makes building MCP servers and clients simple and intuitive\n- [https://gofastmcp.com/getting-started/welcome.md](https://gofastmcp.com/getting-started/welcome.md)\n\n## Integrations\n\n- [Anthropic API + FastMCP - FastMCP](https://gofastmcp.com/integrations/anthropic): --- title Anthropic API  FastMCP - FastMCP description Call FastMCP servers from the Anthropic API sitename FastMCP date 2024-05-29 --- Call FastMCP servers from the Anthropic API Anthropics Messages API supports MCP servers as remote tool sources This tutorial will show you how to create a FastMCP server and deploy it to a public URL, then how to call it from the Messages API\n- [ChatGPT + FastMCP - FastMCP](https://gofastmcp.com/integrations/chatgpt): --- title ChatGPT  FastMCP - FastMCP description Connect FastMCP servers to ChatGPT Deep Research sitename FastMCP date 2024-05-29 --- Connect FastMCP servers to ChatGPT Deep Research ChatGPT supports MCP servers through remote HTTP connections, allowing you to extend ChatGPTs capabilities with custom tools and knowledge from your FastMCP servers MCP integration with ChatGPT is currently limited to Deep Research functionality and is not available for general chat\n- [Claude Code + FastMCP - FastMCP](https://gofastmcp.com/integrations/claude-code): --- title Claude Code  FastMCP - FastMCP description Connect FastMCP servers to Claude Code sitename FastMCP date 2024-05-29 --- Connect FastMCP servers to Claude Code Claude Code supports MCP servers through multiple transport methods, allowing you to extend Claudes capabilities with custom tools, resources, and prompts from your FastMCP servers Claude Code supports both local and remote MCP servers with flexible configuration options\n- [Claude Desktop + FastMCP - FastMCP](https://gofastmcp.com/integrations/claude-desktop): --- title Claude Desktop  FastMCP - FastMCP description Call FastMCP servers from Claude Desktop sitename FastMCP date 2024-05-29 --- Call FastMCP servers from Claude Desktop Claude Desktop supports MCP servers through local STDIO connections and remote servers beta, allowing you to extend Claudes capabilities with custom tools, resources, and prompts from your FastMCP servers\n- [Contrib Modules - FastMCP](https://gofastmcp.com/integrations/contrib): --- title Contrib Modules - FastMCP description Community-contributed modules extending FastMCP sitename FastMCP date 2024-05-29 --- Community-contributed modules extending FastMCP New in version 2 1 FastMCP includes a contrib package that holds community-contributed modules These modules extend FastMCPs functionality but arent officially maintained by the core team Contrib modules provide additional features, integrations, or patterns that complement the core FastMCP library\n- [Gemini SDK + FastMCP - FastMCP](https://gofastmcp.com/integrations/gemini): --- title Gemini SDK  FastMCP - FastMCP description Call FastMCP servers from the Google Gemini SDK sitename FastMCP date 2024-05-29 --- Call FastMCP servers from the Google Gemini SDK Googles Gemini API includes built-in support for MCP servers in their Python and JavaScript SDKs, allowing you to connect directly to MCP servers and use their tools seamlessly with Gemini models Googles Gemini Python SDK can use FastMCP clients directly\n- [OpenAI API + FastMCP - FastMCP](https://gofastmcp.com/integrations/openai): --- title OpenAI API  FastMCP - FastMCP description Call FastMCP servers from the OpenAI API sitename FastMCP date 2024-05-29 --- Call FastMCP servers from the OpenAI API OpenAIs Responses API supports MCP servers as remote tool sources, allowing you to extend AI capabilities with custom functions The Responses API is a distinct API from OpenAIs Completions API or Assistants API At this time, only the Responses API supports MCP\n\n## Patterns\n\n- [FastMCP CLI - FastMCP](https://gofastmcp.com/patterns/cli): --- title FastMCP CLI - FastMCP description Learn how to use the FastMCP command-line interface sitename FastMCP date 2024-05-29 --- Learn how to use the FastMCP command-line interface FastMCP provides a command-line interface CLI that makes it easy to run, develop, and install your MCP servers The CLI is automatically installed when you install FastMCP run Run a FastMCP server directly or proxy a remote server This command runs the server directly in your current Python environment\n- [Decorating Methods - FastMCP](https://gofastmcp.com/patterns/decorating-methods): --- title Decorating Methods - FastMCP description Properly use instance methods, class methods, and static methods with FastMCP decorators sitename FastMCP date 2024-05-29 --- Properly use instance methods, class methods, and static methods with FastMCP decorators FastMCPs decorator system is designed to work with functions, but you may see unexpected behavior if you try to decorate an instance or class method\n- [HTTP Requests - FastMCP](https://gofastmcp.com/patterns/http-requests): --- title HTTP Requests - FastMCP description Accessing and using HTTP requests in FastMCP servers sitename FastMCP date 2024-05-29 --- New in version 2 11 Overview When running FastMCP as a web server, your MCP tools, resources, and prompts might need to access the underlying HTTP request information, such as headers, client IP, or query parameters FastMCP provides a clean way to access HTTP request information through a dependency function\n- [Testing MCP Servers - FastMCP](https://gofastmcp.com/patterns/testing): --- title Testing MCP Servers - FastMCP description Learn how to test your FastMCP servers effectively sitename FastMCP date 2024-05-29 --- Learn how to test your FastMCP servers effectively Testing your MCP servers thoroughly is essential for ensuring they work correctly when deployed FastMCP makes this easy through a variety of testing patterns The most efficient way to test an MCP server is to pass your FastMCP server instance directly to a Client\n- [Tool Transformation - FastMCP](https://gofastmcp.com/patterns/tool-transformation): --- title Tool Transformation - FastMCP description Create enhanced tool variants with modified schemas, argument mappings, and custom behavior sitename FastMCP date 2024-05-29 --- Create enhanced tool variants with modified schemas, argument mappings, and custom behavior 0 Tool transformation allows you to create new, enhanced tools from existing ones\n\n## Python-Sdk\n\n- [__init__ - FastMCP](https://gofastmcp.com/python-sdk/fastmcp-cli-__init__): --- title __init__ - FastMCP sitename FastMCP date 2024-05-29 --- FastMCP home page FastMCP Search the docs K Ask AI jlowinfastmcp jlowinfastmcp Search Navigation __init__ Documentation SDK Reference Python SDK exceptions settings fastmcp cli __init__ claude cli run fastmcp client __init__ auth client logging oauth_callback progress roots sampling transports fastmcp prompts __init__ prompt prompt_manager fastmcp resources __init__ resource resource_manager template types fastmcp\n- [claude - FastMCP](https://gofastmcp.com/python-sdk/fastmcp-cli-claude): --- title claude - FastMCP sitename FastMCP date 2024-05-29 --- fastmcp claude Claude app integration utilities get_claude_config_path Get the Claude config directory based on platform update_claude_config Add or update a FastMCP server in Claudes configuration\n- [cli - FastMCP](https://gofastmcp.com/python-sdk/fastmcp-cli-cli): --- title cli - FastMCP sitename FastMCP date 2024-05-29 --- fastmcp cli FastMCP CLI tools Functions version dev devserver_spec str  typer , help  Python file to run, optionally with object suffix , with_editable AnnotatedPath  None , typer Option --with-editable , -e , help  Directory containing pyproject toml to install in editable mode , exists  True , file_okay  False , resolve_path  True   None , with_packages Annotatedlist str , typer\n- [run - FastMCP](https://gofastmcp.com/python-sdk/fastmcp-cli-run): --- title run - FastMCP sitename FastMCP date 2024-05-29 --- fastmcp run FastMCP run command implementation is_url Check if a string is a URL parse_file_path Parse a file path that may include a server object specification Args server_spec  Path to file, optionally with object suffixReturns import_server Import a MCP server from a file\n- [__init__ - FastMCP](https://gofastmcp.com/python-sdk/fastmcp-client-__init__): --- title __init__ - FastMCP sitename FastMCP date 2024-05-29 --- FastMCP home page FastMCP Search the docs K Ask AI jlowinfastmcp jlowinfastmcp Search Navigation __init__ Documentation SDK Reference Python SDK exceptions settings fastmcp cli __init__ claude cli run fastmcp client __init__ auth client logging oauth_callback progress roots sampling transports fastmcp prompts __init__ prompt prompt_manager fastmcp resources __init__ resource resource_manager template types fastmcp\n- [__init__ - FastMCP](https://gofastmcp.com/python-sdk/fastmcp-client-auth-__init__): --- title __init__ - FastMCP sitename FastMCP date 2024-05-29 --- FastMCP home page FastMCP Search the docs K Ask AI jlowinfastmcp jlowinfastmcp Search Navigation __init__ Documentation SDK Reference Python SDK exceptions settings fastmcp cli __init__ claude cli run fastmcp client __init__ auth client logging oauth_callback progress roots sampling transports fastmcp prompts __init__ prompt prompt_manager fastmcp resources __init__ resource resource_manager template types fastmcp\n- [bearer - FastMCP](https://gofastmcp.com/python-sdk/fastmcp-client-auth-bearer): --- title bearer - FastMCP sitename FastMCP date 2024-05-29 --- FastMCP home page FastMCP Search the docs K Ask AI jlowinfastmcp jlowinfastmcp Search Navigation bearer Documentation SDK Reference Python SDK exceptions settings fastmcp cli __init__ claude cli run fastmcp client __init__ auth client logging oauth_callback progress roots sampling transports fastmcp prompts __init__ prompt prompt_manager fastmcp resources __init__ resource resource_manager template types fastmcp\n- [oauth - FastMCP](https://gofastmcp.com/python-sdk/fastmcp-client-auth-oauth): --- title oauth - FastMCP sitename FastMCP date 2024-05-29 --- fastmcp oauth default_cache_dir OAuth Create an OAuthClientProvider for an MCP server This is intended to be provided to the auth parameter of an httpx AsyncClient or appropriate FastMCP clienttransport instance Args mcp_url  Full URL to the MCP endpoint e httphostmcpssescopes  OAuth scopes to request\n- [client - FastMCP](https://gofastmcp.com/python-sdk/fastmcp-client-client): --- title client - FastMCP sitename FastMCP date 2024-05-29 --- fastmcp client Client MCP client that delegates connection management to a Transport instance The Client class is responsible for MCP protocol logic, while the Transport handles connection establishment and management Client provides methods for working with resources, prompts, tools and other MCP capabilities\n- [logging - FastMCP](https://gofastmcp.com/python-sdk/fastmcp-client-logging): --- title logging - FastMCP sitename FastMCP date 2024-05-29 --- fastmcp logging create_log_callback create_log_callbackhandler LogHandler  None  None - LoggingFnT\n\n## Servers\n\n- [Bearer Token Authentication - FastMCP](https://gofastmcp.com/servers/auth/bearer): --- title Bearer Token Authentication - FastMCP description Secure your FastMCP servers HTTP endpoints by validating JWT Bearer tokens sitename FastMCP date 2024-05-29 --- Secure your FastMCP servers HTTP endpoints by validating JWT Bearer tokens 0 Authentication and authorization are only relevant for HTTP-based transports The MCP specification requires servers to implement full OAuth 2\n- [Server Composition - FastMCP](https://gofastmcp.com/servers/composition): --- title Server Composition - FastMCP description Combine multiple FastMCP servers into a single, larger application using mounting and importing sitename FastMCP date 2024-05-29 --- New in version 2 0 As your MCP applications grow, you might want to organize your tools, resources, and prompts into logical modules or reuse existing server components FastMCP supports composition through two methods import_server  For a one-time copy of components with prefixing static composition\n- [MCP Context - FastMCP](https://gofastmcp.com/servers/context): --- title MCP Context - FastMCP description Access MCP capabilities like logging, progress, and resources within your MCP objects sitename FastMCP date 2024-05-29 --- When defining FastMCP tools, resources, resource templates, or prompts, your functions might need to interact with the underlying MCP session or access server capabilities FastMCP provides the Context object for this purpose\n- [MCP Middleware - FastMCP](https://gofastmcp.com/servers/middleware): --- title MCP Middleware - FastMCP description Add cross-cutting functionality to your MCP server with middleware that can inspect, modify, and respond to all MCP requests and responses sitename FastMCP date 2024-05-29 --- New in version 2 0 MCP middleware is a powerful concept that allows you to add cross-cutting functionality to your FastMCP server\n- [OpenAPI Integration - FastMCP](https://gofastmcp.com/servers/openapi): --- title OpenAPI Integration - FastMCP description Generate MCP servers from OpenAPI specs and FastAPI apps sitename FastMCP date 2024-05-29 --- Generate MCP servers from OpenAPI specs and FastAPI apps New in version2 0 FastMCP can automatically generate an MCP server from an OpenAPI specification or FastAPI app Instead of manually creating tools and resources, you provide an OpenAPI spec and FastMCP intelligently converts your API endpoints into the appropriate MCP components\n- [Prompts - FastMCP](https://gofastmcp.com/servers/prompts): --- title Prompts - FastMCP description Create reusable, parameterized prompt templates for MCP clients sitename FastMCP date 2024-05-29 --- Create reusable, parameterized prompt templates for MCP clients Prompts are reusable message templates that help LLMs generate structured, purposeful responses FastMCP simplifies defining these templates, primarily using the mcp Prompts provide parameterized message templates for LLMs\n- [Proxy Servers - FastMCP](https://gofastmcp.com/servers/proxy): --- title Proxy Servers - FastMCP description Use FastMCP to act as an intermediary or change transport for other MCP servers sitename FastMCP date 2024-05-29 --- New in version 2 0 FastMCP provides a powerful proxying capability that allows one FastMCP server instance to act as a frontend for another MCP server which could be remote, running on a different transport, or even another FastMCP instance This is achieved using the FastMCP as_proxy class method\n- [Resources & Templates - FastMCP](https://gofastmcp.com/servers/resources): --- title Resources  Templates - FastMCP description Expose data sources and dynamic content generators to your MCP client sitename FastMCP date 2024-05-29 --- Expose data sources and dynamic content generators to your MCP client Resources represent data or files that an MCP client can read, and resource templates extend this concept by allowing clients to request dynamically generated resources based on parameters passed in the URI\n- [The FastMCP Server - FastMCP](https://gofastmcp.com/servers/server): --- title The FastMCP Server - FastMCP description The core FastMCP server class for building MCP applications with tools, resources, and prompts sitename FastMCP date 2024-05-29 --- The core FastMCP server class for building MCP applications with tools, resources, and prompts The central piece of a FastMCP application is the FastMCP server class This class acts as the main container for your applications tools, resources, and prompts, and manages communication with MCP clients\n- [Tools - FastMCP](https://gofastmcp.com/servers/tools): --- title Tools - FastMCP description Expose functions as executable capabilities for your MCP client sitename FastMCP date 2023-04-15 --- Expose functions as executable capabilities for your MCP client Tools are the core building blocks that allow your LLM to interact with external systems, execute code, and access data that isnt in its training data In FastMCP, tools are Python functions exposed to LLMs through the MCP protocol\n\n## Tutorials\n\n- [How to Create an MCP Server in Python - FastMCP](https://gofastmcp.com/tutorials/create-mcp-server): --- title How to Create an MCP Server in Python - FastMCP description A step-by-step guide to building a Model Context Protocol MCP server using Python and FastMCP, from basic tools to dynamic resources sitename FastMCP date 2024-05-29 --- A step-by-step guide to building a Model Context Protocol MCP server using Python and FastMCP, from basic tools to dynamic resources So you want to build a Model Context Protocol MCP server in Python\n- [What is the Model Context Protocol (MCP)? - FastMCP](https://gofastmcp.com/tutorials/mcp): --- title What is the Model Context Protocol MCP - FastMCP description An introduction to the core concepts of the Model Context Protocol MCP, explaining what it is, why its useful, and how it works sitename FastMCP date 2024-05-29 --- An introduction to the core concepts of the Model Context Protocol MCP, explaining what it is, why its useful, and how it works\n- [How to Connect an LLM to a REST API - FastMCP](https://gofastmcp.com/tutorials/rest-api): --- title How to Connect an LLM to a REST API - FastMCP description A step-by-step guide to making any REST API with an OpenAPI spec available to LLMs using FastMCP sitename FastMCP date 2024-05-29 --- A step-by-step guide to making any REST API with an OpenAPI spec available to LLMs using FastMCP Youve built a powerful REST API, and now you want your LLM to be able to use it Manually writing a wrapper function for every single endpoint is tedious, error-prone, and hard to maintain\n\n## Updates\n\n- [FastMCP Updates - FastMCP](https://gofastmcp.com/updates): --- title FastMCP Updates - FastMCP sitename FastMCP date 2025-05-21 --- FastMCP 2 8 is here, and its all about taking control of your tools This release is packed with new features for curating the perfect LLM experience  Tool Transformation The headline feature lets you wrap any toolfrom your own code, a third-party library, or an OpenAPI specto create an enhanced, LLM-friendly version You can rename arguments, rewrite descriptions, and hide parameters without touching the original code\n\n## Llms.Txt\n\n- [https://gofastmcp.com/llms.txt](https://gofastmcp.com/llms.txt)\n\n## Llms-Full.Txt\n\n- [https://gofastmcp.com/llms-full.txt](https://gofastmcp.com/llms-full.txt): --- date 2023-04-15 ---  null Source httpsgofastmcp 0 Stuck in the Middleware With Youhttpsgithub comjlowinfastmcpreleasestagv2 9 introduces two important features that push beyond the basic MCP protocol MCP Middleware and server-side type conversion MCP Middleware MCP middleware lets you intercept and modify requests and responses at the protocol level, giving you powerful capabilities for logging, authentication, validation, and more",
+  "recommendations": [
+    {
+      "type": "conversion",
+      "priority": "medium",
+      "title": "Missing Conversion Intents",
+      "description": "No clear transactional or conversion intents detected.",
+      "suggested_actions": [
+        "Add clear pricing information",
+        "Include contact or consultation options",
+        "Create product/service purchase flows",
+        "Add trial or demo opportunities"
+      ]
+    }
+  ]
+}
