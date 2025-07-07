@@ -171,20 +171,60 @@ class LLMInterface:
         self.logger.info(f"Set current provider to: {name}")
     
     def generate(self, prompt: str, temperature: float = 0.7, max_tokens: int = 500, 
-                 provider: Optional[str] = None) -> str:
+                 provider: Optional[str] = None, model: Optional[str] = None) -> str:
         """Generate a response using the specified or current provider"""
         provider_name = provider or self.current_provider
         
         if not provider_name:
             raise RuntimeError("No provider selected")
         
-        if provider_name not in self.providers:
-            raise ValueError(f"Provider '{provider_name}' not found")
+        # If model is specified, check if we need a provider instance for this specific model
+        provider_key = provider_name
+        if model:
+            provider_key = f"{provider_name}:{model}"
+            
+            # Create a new provider instance for this model if it doesn't exist
+            if provider_key not in self.providers:
+                self._create_provider_for_model(provider_name, model)
         
-        provider_obj = self.providers[provider_name]
-        self.logger.info(f"Generating response using {provider_name}")
+        if provider_key not in self.providers:
+            raise ValueError(f"Provider '{provider_key}' not found")
+        
+        provider_obj = self.providers[provider_key]
+        self.logger.info(f"Generating response using {provider_name} with model {model or 'default'}")
         
         return provider_obj.generate(prompt, temperature, max_tokens)
+    
+    def _create_provider_for_model(self, provider_name: str, model: str):
+        """Create a provider instance for a specific model"""
+        # Find the base provider configuration
+        base_provider = None
+        for key, provider in self.providers.items():
+            if key.startswith(provider_name) or key == provider_name:
+                base_provider = provider
+                break
+        
+        if not base_provider:
+            raise ValueError(f"Base provider '{provider_name}' not found")
+        
+        # Create new provider instance with specific model
+        provider_key = f"{provider_name}:{model}"
+        if provider_name == 'openai':
+            new_provider = OpenAIProvider(
+                api_key=base_provider.api_key,
+                endpoint=base_provider.endpoint,
+                model=model
+            )
+        elif provider_name == 'anthropic':
+            new_provider = AnthropicProvider(
+                api_key=base_provider.api_key,
+                endpoint=base_provider.endpoint,
+                model=model
+            )
+        else:
+            raise ValueError(f"Unknown provider type: {provider_name}")
+        
+        self.providers[provider_key] = new_provider
     
     def get_available_providers(self) -> List[str]:
         """Get list of available providers"""
@@ -195,30 +235,38 @@ class LLMInterface:
         """Create LLM interface from configuration"""
         interface = cls()
         
-        # Add OpenAI provider if configured
-        if 'openai' in config.llm_providers:
+        # Get unique providers needed from LLM configurations
+        providers_needed = set()
+        for llm in config.llms:
+            providers_needed.add(llm.provider)
+        
+        # Add OpenAI provider if any LLM uses it
+        if 'openai' in providers_needed and 'openai' in config.llm_providers:
             provider_config = config.llm_providers['openai']
             if provider_config.api_key:
+                # Use a default model - the specific model will be set when executing prompts
                 provider = OpenAIProvider(
                     api_key=provider_config.api_key,
                     endpoint=provider_config.endpoint,
-                    model=config.settings.model if config.settings.llm_provider == 'openai' else 'gpt-4'
+                    model='gpt-4'  # Default model
                 )
                 interface.add_provider('openai', provider)
         
-        # Add Anthropic provider if configured
-        if 'anthropic' in config.llm_providers:
+        # Add Anthropic provider if any LLM uses it
+        if 'anthropic' in providers_needed and 'anthropic' in config.llm_providers:
             provider_config = config.llm_providers['anthropic']
             if provider_config.api_key:
+                # Use a default model - the specific model will be set when executing prompts
                 provider = AnthropicProvider(
                     api_key=provider_config.api_key,
                     endpoint=provider_config.endpoint,
-                    model=config.settings.model if config.settings.llm_provider == 'anthropic' else 'claude-3-sonnet-20240229'
+                    model='claude-3-sonnet-20240229'  # Default model
                 )
                 interface.add_provider('anthropic', provider)
         
-        # Set the default provider
-        if config.settings.llm_provider in interface.providers:
-            interface.set_provider(config.settings.llm_provider)
+        # Set the first available provider as default
+        available_providers = interface.get_available_providers()
+        if available_providers:
+            interface.set_provider(available_providers[0])
         
         return interface

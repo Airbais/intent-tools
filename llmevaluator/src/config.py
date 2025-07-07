@@ -30,13 +30,18 @@ class Prompt:
     id: Optional[str] = None
 
 @dataclass
-class EvaluationSettings:
-    llm_provider: str = "openai"
-    model: str = "gpt-4"
+class LLMConfig:
+    name: str
+    provider: str
+    model: str
     temperature: float = 0.7
     max_tokens: int = 500
+
+@dataclass
+class EvaluationSettings:
     cache_responses: bool = True
     sentiment_method: str = "hybrid"
+    llms: List[LLMConfig] = field(default_factory=list)
 
 @dataclass
 class LLMProviderConfig:
@@ -53,6 +58,7 @@ class ConfigurationManager:
         self.prompts: List[Prompt] = []
         self.settings: EvaluationSettings = EvaluationSettings()
         self.llm_providers: Dict[str, LLMProviderConfig] = self._load_default_providers()
+        self.llms: List[LLMConfig] = []
         
         if self.config_path and self.config_path.exists():
             self.load_configuration()
@@ -110,6 +116,9 @@ class ConfigurationManager:
             elif line.startswith('## Evaluation Prompts'):
                 current_section = 'prompts'
                 self.prompts = self._parse_prompts_section(lines, i + 1)
+            elif line.startswith('## LLMs'):
+                current_section = 'llms'
+                self._parse_llms_section(lines, i + 1)
             elif line.startswith('## Evaluation Settings'):
                 current_section = 'settings'
                 self._parse_settings_section(lines, i + 1)
@@ -175,6 +184,51 @@ class ConfigurationManager:
         
         return prompts
     
+    def _parse_llms_section(self, lines: List[str], start_idx: int) -> None:
+        """Parse LLMs configuration section"""
+        self.llms = []
+        i = start_idx
+        current_llm_data = None
+        
+        while i < len(lines) and not lines[i].strip().startswith('##'):
+            line = lines[i].strip()
+            
+            if line.startswith('- name:'):
+                # Save previous LLM if exists
+                if current_llm_data and self._is_valid_llm_config(current_llm_data):
+                    self.llms.append(LLMConfig(**current_llm_data))
+                # Start new LLM config
+                current_llm_data = {}
+                current_llm_data['name'] = line.split(':', 1)[1].strip()
+            elif line and not line.startswith('- ') and current_llm_data is not None:
+                # Parse sub-properties
+                if ':' in line:
+                    key, value = line.strip().split(':', 1)
+                    key = key.strip()
+                    value = value.strip()
+                    
+                    if key == 'temperature':
+                        current_llm_data['temperature'] = float(value)
+                    elif key == 'max_tokens':
+                        current_llm_data['max_tokens'] = int(value)
+                    else:
+                        current_llm_data[key] = value
+            
+            i += 1
+        
+        # Save last LLM
+        if current_llm_data and self._is_valid_llm_config(current_llm_data):
+            self.llms.append(LLMConfig(**current_llm_data))
+        
+        # Update settings with LLMs
+        self.settings.llms = self.llms
+    
+    def _is_valid_llm_config(self, llm_data: dict) -> bool:
+        """Check if LLM configuration has required fields"""
+        return ('name' in llm_data and 
+                'provider' in llm_data and 
+                'model' in llm_data)
+    
     def _parse_settings_section(self, lines: List[str], start_idx: int) -> None:
         """Parse evaluation settings section"""
         settings_data = {}
@@ -190,12 +244,10 @@ class ConfigurationManager:
                     key = key.lower().replace(' ', '_')
                     
                     # Convert values to appropriate types
-                    if key == 'temperature':
-                        value = float(value)
-                    elif key == 'max_tokens':
-                        value = int(value)
-                    elif key == 'cache_responses':
+                    if key == 'cache_responses':
                         value = value.lower() == 'true'
+                    elif key == 'sentiment_method':
+                        value = str(value)
                     
                     settings_data[key] = value
             
@@ -261,12 +313,16 @@ class ConfigurationManager:
         if not self.prompts:
             issues.append("At least one evaluation prompt is required")
         
-        # Check if selected provider is configured
-        provider = self.get_provider_config(self.settings.llm_provider)
-        if not provider:
-            issues.append(f"LLM provider '{self.settings.llm_provider}' is not configured")
-        elif not provider.api_key:
-            issues.append(f"API key for '{self.settings.llm_provider}' is not set")
+        if not self.llms:
+            issues.append("At least one LLM configuration is required")
+        
+        # Check each LLM configuration
+        for llm in self.llms:
+            provider = self.get_provider_config(llm.provider)
+            if not provider:
+                issues.append(f"LLM provider '{llm.provider}' for '{llm.name}' is not configured")
+            elif not provider.api_key:
+                issues.append(f"API key for '{llm.provider}' is not set")
         
         return issues
     
@@ -286,11 +342,16 @@ class ConfigurationManager:
                     'category': p.category
                 } for p in self.prompts
             ],
+            'llms': [
+                {
+                    'name': llm.name,
+                    'provider': llm.provider,
+                    'model': llm.model,
+                    'temperature': llm.temperature,
+                    'max_tokens': llm.max_tokens
+                } for llm in self.llms
+            ],
             'settings': {
-                'llm_provider': self.settings.llm_provider,
-                'model': self.settings.model,
-                'temperature': self.settings.temperature,
-                'max_tokens': self.settings.max_tokens,
                 'cache_responses': self.settings.cache_responses,
                 'sentiment_method': self.settings.sentiment_method
             }

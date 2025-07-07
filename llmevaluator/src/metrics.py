@@ -38,6 +38,23 @@ class AggregateMetrics:
     prompts_with_mentions: int = 0
     prompts_with_website: int = 0
 
+@dataclass
+class ComparativeMetrics:
+    """Metrics comparing performance across multiple LLMs"""
+    enabled: bool = True
+    mention_rate_variance: float = 0.0
+    sentiment_alignment: float = 0.0
+    consensus_score: float = 0.0
+    response_consistency: Dict[str, float] = field(default_factory=dict)
+    llm_agreement_matrix: Dict[str, Dict[str, float]] = field(default_factory=dict)
+
+@dataclass
+class MultiLLMMetrics:
+    """Container for multi-LLM evaluation metrics"""
+    llm_metrics: Dict[str, AggregateMetrics] = field(default_factory=dict)
+    comparative_metrics: ComparativeMetrics = field(default_factory=ComparativeMetrics)
+    aggregate_metrics: AggregateMetrics = field(default_factory=AggregateMetrics)
+
 class MetricsCalculator:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
@@ -73,8 +90,9 @@ class MetricsCalculator:
             if analysis.website_mentions > 0:
                 metrics.prompts_with_website += 1
             
-            # Collect sentiment data
-            all_sentiments.append(analysis.sentiment_score)
+            # Collect sentiment data (only for responses with brand mentions)
+            if analysis.sentiment_label != "not_mentioned":
+                all_sentiments.append(analysis.sentiment_score)
             metrics.sentiment_distribution[analysis.sentiment_label] = \
                 metrics.sentiment_distribution.get(analysis.sentiment_label, 0) + 1
             
@@ -109,6 +127,47 @@ class MetricsCalculator:
         self.logger.info(f"Calculated metrics for {metrics.total_prompts} prompts")
         return metrics
     
+    def calculate_multi_llm_metrics(self, results: List['MultiLLMPromptResult'], 
+                                   analyses: Dict[str, Dict[str, ResponseAnalysis]]) -> 'MultiLLMMetrics':
+        """Calculate metrics for multi-LLM evaluation"""
+        multi_metrics = MultiLLMMetrics()
+        
+        # Get list of LLM names
+        llm_names = set()
+        for result in results:
+            llm_names.update(result.llm_results.keys())
+        llm_names = sorted(llm_names)
+        
+        # Calculate per-LLM metrics
+        for llm_name in llm_names:
+            llm_results = []
+            llm_analyses = {}
+            
+            # Extract results for this LLM
+            for prompt_result in results:
+                if llm_name in prompt_result.llm_results:
+                    llm_result = prompt_result.llm_results[llm_name]
+                    llm_results.append(llm_result)
+                    
+                    # Get corresponding analysis
+                    if prompt_result.prompt_id in analyses and llm_name in analyses[prompt_result.prompt_id]:
+                        llm_analyses[llm_result.prompt_id] = analyses[prompt_result.prompt_id][llm_name]
+            
+            # Calculate metrics for this LLM
+            multi_metrics.llm_metrics[llm_name] = self.calculate_metrics(llm_results, llm_analyses)
+        
+        # Calculate comparative metrics if more than one LLM
+        if len(llm_names) > 1:
+            multi_metrics.comparative_metrics = self._calculate_comparative_metrics(results, analyses)
+        else:
+            multi_metrics.comparative_metrics.enabled = False
+        
+        # Calculate aggregate metrics across all LLMs
+        multi_metrics.aggregate_metrics = self._calculate_aggregate_multi_metrics(multi_metrics.llm_metrics)
+        
+        self.logger.info(f"Calculated multi-LLM metrics for {len(llm_names)} LLMs")
+        return multi_metrics
+    
     def _calculate_category_metrics(self, category_items: List[tuple]) -> CategoryMetrics:
         """Calculate metrics for a specific category"""
         cat_metrics = CategoryMetrics()
@@ -119,8 +178,9 @@ class MetricsCalculator:
             cat_metrics.total_mentions += analysis.brand_mentions
             cat_metrics.total_website_mentions += analysis.website_mentions
             
-            # Sentiment tracking
-            sentiments.append(analysis.sentiment_score)
+            # Sentiment tracking (only for responses with brand mentions)
+            if analysis.sentiment_label != "not_mentioned":
+                sentiments.append(analysis.sentiment_score)
             cat_metrics.sentiment_distribution[analysis.sentiment_label] = \
                 cat_metrics.sentiment_distribution.get(analysis.sentiment_label, 0) + 1
             
@@ -138,6 +198,119 @@ class MetricsCalculator:
         
         return cat_metrics
     
+    def _calculate_comparative_metrics(self, results: List['MultiLLMPromptResult'], 
+                                     analyses: Dict[str, Dict[str, ResponseAnalysis]]) -> 'ComparativeMetrics':
+        """Calculate metrics comparing LLM performance"""
+        comp_metrics = ComparativeMetrics()
+        
+        # Get LLM names
+        llm_names = set()
+        for result in results:
+            llm_names.update(result.llm_results.keys())
+        
+        # Calculate mention rate variance
+        mention_rates = []
+        for llm_name in llm_names:
+            mentions = 0
+            total = 0
+            for prompt_result in results:
+                if llm_name in prompt_result.llm_results and prompt_result.prompt_id in analyses:
+                    if llm_name in analyses[prompt_result.prompt_id]:
+                        analysis = analyses[prompt_result.prompt_id][llm_name]
+                        mentions += 1 if analysis.brand_mentions > 0 else 0
+                        total += 1
+            if total > 0:
+                mention_rates.append(mentions / total)
+        
+        if len(mention_rates) > 1:
+            comp_metrics.mention_rate_variance = statistics.stdev(mention_rates)
+        
+        # Calculate sentiment alignment
+        sentiment_scores = defaultdict(list)
+        for prompt_result in results:
+            prompt_id = prompt_result.prompt_id
+            if prompt_id in analyses:
+                for llm_name, analysis in analyses[prompt_id].items():
+                    if analysis.sentiment_label != "not_mentioned":
+                        sentiment_scores[prompt_id].append((llm_name, analysis.sentiment_score))
+        
+        # Calculate pairwise sentiment correlation
+        if len(sentiment_scores) > 0:
+            total_alignment = 0
+            count = 0
+            for prompt_sentiments in sentiment_scores.values():
+                if len(prompt_sentiments) > 1:
+                    # Calculate variance for this prompt
+                    scores = [s[1] for s in prompt_sentiments]
+                    if len(scores) > 1:
+                        alignment = 1 - min(statistics.stdev(scores), 1.0)  # Normalize to 0-1
+                        total_alignment += alignment
+                        count += 1
+            
+            comp_metrics.sentiment_alignment = total_alignment / count if count > 0 else 0.0
+        
+        # Calculate consensus score (how often LLMs agree on mentioning the brand)
+        mention_agreement = 0
+        total_prompts = 0
+        
+        for prompt_result in results:
+            prompt_id = prompt_result.prompt_id
+            if prompt_id in analyses:
+                mentions = []
+                for llm_name in llm_names:
+                    if llm_name in analyses[prompt_id]:
+                        analysis = analyses[prompt_id][llm_name]
+                        mentions.append(1 if analysis.brand_mentions > 0 else 0)
+                
+                if len(mentions) == len(llm_names):
+                    # All agree (either all mention or all don't mention)
+                    if all(m == mentions[0] for m in mentions):
+                        mention_agreement += 1
+                    total_prompts += 1
+        
+        comp_metrics.consensus_score = mention_agreement / total_prompts if total_prompts > 0 else 0.0
+        
+        return comp_metrics
+    
+    def _calculate_aggregate_multi_metrics(self, llm_metrics: Dict[str, AggregateMetrics]) -> AggregateMetrics:
+        """Calculate aggregate metrics across all LLMs"""
+        agg = AggregateMetrics()
+        
+        if not llm_metrics:
+            return agg
+        
+        # Get the first LLM metrics as reference for structure
+        first_metrics = next(iter(llm_metrics.values()))
+        agg.total_prompts = first_metrics.total_prompts
+        
+        # Calculate averages across all LLMs
+        all_mention_rates = []
+        all_sentiments = []
+        
+        for metrics in llm_metrics.values():
+            all_mention_rates.append(metrics.mention_rate)
+            if metrics.average_sentiment != 0.0:
+                all_sentiments.append(metrics.average_sentiment)
+            
+            # Aggregate counts
+            agg.total_brand_mentions += metrics.total_brand_mentions
+            agg.total_website_mentions += metrics.total_website_mentions
+            agg.prompts_with_mentions += metrics.prompts_with_mentions
+            agg.prompts_with_website += metrics.prompts_with_website
+        
+        # Calculate averages
+        num_llms = len(llm_metrics)
+        if num_llms > 0:
+            agg.mention_rate = statistics.mean(all_mention_rates)
+            agg.website_mention_rate = agg.total_website_mentions / (agg.total_prompts * num_llms)
+            agg.prompts_with_mentions = agg.prompts_with_mentions / num_llms
+            agg.prompts_with_website = agg.prompts_with_website / num_llms
+        
+        if all_sentiments:
+            agg.average_sentiment = statistics.mean(all_sentiments)
+        
+        return agg
+    
     def generate_insights(self, metrics: AggregateMetrics) -> List[str]:
         """Generate human-readable insights from metrics"""
         insights = []
@@ -150,13 +323,19 @@ class MetricsCalculator:
                 f"({metrics.prompts_with_mentions}/{metrics.total_prompts} prompts)"
             )
         
-        # Sentiment insight
-        if metrics.average_sentiment > 0.3:
-            insights.append(f"Overall sentiment is positive (score: {metrics.average_sentiment:.2f})")
-        elif metrics.average_sentiment < -0.3:
-            insights.append(f"Overall sentiment is negative (score: {metrics.average_sentiment:.2f})")
+        # Sentiment insight - only for responses with brand mentions
+        not_mentioned_count = metrics.sentiment_distribution.get("not_mentioned", 0)
+        brand_mentioned_count = metrics.total_prompts - not_mentioned_count
+        
+        if brand_mentioned_count > 0:
+            if metrics.average_sentiment > 0.3:
+                insights.append(f"Brand sentiment is positive when mentioned (score: {metrics.average_sentiment:.2f}, {brand_mentioned_count} mentions)")
+            elif metrics.average_sentiment < -0.3:
+                insights.append(f"Brand sentiment is negative when mentioned (score: {metrics.average_sentiment:.2f}, {brand_mentioned_count} mentions)")
+            else:
+                insights.append(f"Brand sentiment is neutral when mentioned (score: {metrics.average_sentiment:.2f}, {brand_mentioned_count} mentions)")
         else:
-            insights.append(f"Overall sentiment is neutral (score: {metrics.average_sentiment:.2f})")
+            insights.append("No brand-specific sentiment available (brand not mentioned in any responses)")
         
         # Position insight
         if metrics.position_distribution:

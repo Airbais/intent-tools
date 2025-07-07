@@ -700,6 +700,22 @@ text[fill="rgb(42, 63, 95)"],
   color: var(--text-primary) !important;
 }
 
+/* Specific fix for table headers in dark mode - very light header with dark text */
+[data-theme="dark"] .table thead th,
+[data-theme="dark"] table thead th,
+[data-theme="dark"] .table th,
+[data-theme="dark"] table th {
+  color: var(--gray-900) !important;
+  background-color: var(--gray-50) !important;
+  border-bottom: 2px solid var(--gray-300) !important;
+}
+
+/* Ensure table header background is visible in dark mode */
+[data-theme="dark"] .table thead,
+[data-theme="dark"] table thead {
+  background-color: var(--gray-50) !important;
+}
+
 [data-theme="dark"] .text-muted,
 [data-theme="dark"] .dashboard-subtitle {
   color: var(--text-muted) !important;
@@ -726,4 +742,74 @@ text[fill="rgb(42, 63, 95)"],
 [data-theme="dark"] .js-plotly-plot text {
   fill: var(--text-primary) !important;
   color: var(--text-primary) !important;
+}
+
+/* Additional geoevaluator styles for better dark mode */
+.recommendation-item {
+  transition: all var(--transition-base);
+}
+
+.recommendation-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Fix for all links in tables - make them use theme colors */
+.table a,
+table a {
+  color: var(--primary-orange) !important;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.table a:hover,
+table a:hover {
+  color: var(--primary-orange-dark) !important;
+  text-decoration: underline;
+}
+
+/* Ensure links are visible in dark mode */
+[data-theme="dark"] .table a,
+[data-theme="dark"] table a,
+[data-theme="dark"] a {
+  color: var(--primary-orange-light) !important;
+}
+
+[data-theme="dark"] .table a:hover,
+[data-theme="dark"] table a:hover,
+[data-theme="dark"] a:hover {
+  color: var(--primary-orange) !important;
+}
+
+/* Text color fixes for recommendations and other content */
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .text-muted {
+  color: var(--text-muted) !important;
+}
+
+/* Ensure all text in cards uses proper theme colors */
+.card p,
+.card span,
+.card div {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .card p,
+[data-theme="dark"] .card span,
+[data-theme="dark"] .card div {
+  color: var(--text-secondary) !important;
+}
+
+/* Special handling for recommendation items in dark mode */
+[data-theme="dark"] .recommendation-item p,
+[data-theme="dark"] .recommendation-item span,
+[data-theme="dark"] .recommendation-item div {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .recommendation-item h4 {
+  color: inherit !important; /* Keep the priority color */
 }

@@ -14,7 +14,7 @@ from dataclasses import dataclass, asdict
 import diskcache
 from tqdm import tqdm
 
-from .config import Prompt, EvaluationSettings
+from .config import Prompt, EvaluationSettings, LLMConfig
 from .llm_interface import LLMInterface
 
 @dataclass
@@ -23,11 +23,19 @@ class PromptResult:
     prompt_text: str
     category: str
     response: str
+    llm_name: str
     provider: str
     model: str
     timestamp: str
     cached: bool = False
     error: Optional[str] = None
+
+@dataclass
+class MultiLLMPromptResult:
+    prompt_id: str
+    prompt_text: str
+    category: str
+    llm_results: Dict[str, PromptResult]  # key: llm.name
 
 class PromptExecutor:
     def __init__(self, llm_interface: LLMInterface, cache_dir: str = "./cache", 
@@ -71,16 +79,18 @@ class PromptExecutor:
         except Exception as e:
             self.logger.warning(f"Cache storage error: {e}")
     
-    def execute_single_prompt(self, prompt: Prompt, settings: EvaluationSettings, 
-                            use_cache: bool = True) -> PromptResult:
-        """Execute a single prompt and return the result"""
-        provider = self.llm_interface.current_provider
-        model = settings.model
+    def execute_single_prompt(self, prompt: Prompt, llm_config: LLMConfig, 
+                            settings: EvaluationSettings, use_cache: bool = True) -> PromptResult:
+        """Execute a single prompt against a single LLM and return the result"""
+        # Set the provider for this LLM
+        self.llm_interface.set_provider(llm_config.provider)
+        provider = llm_config.provider
+        model = llm_config.model
         
         # Generate cache key
         cache_key = self._generate_cache_key(
             prompt.text, provider, model, 
-            settings.temperature, settings.max_tokens
+            llm_config.temperature, llm_config.max_tokens
         )
         
         # Check cache if enabled
@@ -89,12 +99,13 @@ class PromptExecutor:
             cached_response = self._get_cached_response(cache_key)
         
         if cached_response is not None:
-            self.logger.debug(f"Using cached response for prompt: {prompt.id}")
+            self.logger.debug(f"Using cached response for prompt: {prompt.id} with {llm_config.name}")
             return PromptResult(
                 prompt_id=prompt.id,
                 prompt_text=prompt.text,
                 category=prompt.category,
                 response=cached_response,
+                llm_name=llm_config.name,
                 provider=provider,
                 model=model,
                 timestamp=datetime.now().isoformat(),
@@ -103,11 +114,13 @@ class PromptExecutor:
         
         # Generate new response
         try:
-            self.logger.info(f"Executing prompt {prompt.id}: {prompt.text[:50]}...")
+            self.logger.info(f"Executing prompt {prompt.id} with {llm_config.name}: {prompt.text[:50]}...")
             response = self.llm_interface.generate(
                 prompt=prompt.text,
-                temperature=settings.temperature,
-                max_tokens=settings.max_tokens
+                temperature=llm_config.temperature,
+                max_tokens=llm_config.max_tokens,
+                provider=llm_config.provider,
+                model=llm_config.model
             )
             
             # Cache the response
@@ -119,6 +132,7 @@ class PromptExecutor:
                 prompt_text=prompt.text,
                 category=prompt.category,
                 response=response,
+                llm_name=llm_config.name,
                 provider=provider,
                 model=model,
                 timestamp=datetime.now().isoformat(),
@@ -132,6 +146,7 @@ class PromptExecutor:
                 prompt_text=prompt.text,
                 category=prompt.category,
                 response="",
+                llm_name=llm_config.name,
                 provider=provider,
                 model=model,
                 timestamp=datetime.now().isoformat(),
@@ -139,16 +154,94 @@ class PromptExecutor:
                 error=str(e)
             )
     
+    def execute_prompt_multi_llm(self, prompt: Prompt, llms: List[LLMConfig],
+                                settings: EvaluationSettings, use_cache: bool = True) -> MultiLLMPromptResult:
+        """Execute a single prompt against multiple LLMs"""
+        result = MultiLLMPromptResult(
+            prompt_id=prompt.id,
+            prompt_text=prompt.text,
+            category=prompt.category,
+            llm_results={}
+        )
+        
+        for llm in llms:
+            llm_result = self.execute_single_prompt(prompt, llm, settings, use_cache)
+            result.llm_results[llm.name] = llm_result
+        
+        return result
+    
     def execute_batch(self, prompts: List[Prompt], settings: EvaluationSettings,
-                     show_progress: bool = True) -> List[PromptResult]:
-        """Execute a batch of prompts with progress tracking"""
+                     show_progress: bool = True) -> List[MultiLLMPromptResult]:
+        """Execute a batch of prompts against all configured LLMs"""
+        results = []
+        llms = settings.llms
+        
+        if not llms:
+            raise ValueError("No LLMs configured in settings")
+        
+        # Calculate total operations for progress bar
+        total_operations = len(prompts) * len(llms)
+        
+        # Create progress bar if requested
+        if show_progress:
+            pbar = tqdm(total=total_operations, desc="Executing prompts")
+        
+        for prompt in prompts:
+            prompt_result = MultiLLMPromptResult(
+                prompt_id=prompt.id,
+                prompt_text=prompt.text,
+                category=prompt.category,
+                llm_results={}
+            )
+            
+            for llm in llms:
+                if show_progress:
+                    pbar.set_description(f"Prompt {prompt.id} - LLM: {llm.name}")
+                
+                llm_result = self.execute_single_prompt(prompt, llm, settings, 
+                                                       use_cache=settings.cache_responses)
+                prompt_result.llm_results[llm.name] = llm_result
+                
+                if show_progress:
+                    status = "cached" if llm_result.cached else "generated"
+                    pbar.set_postfix({"status": status, "llm": llm.name})
+                    pbar.update(1)
+            
+            results.append(prompt_result)
+        
+        if show_progress:
+            pbar.close()
+        
+        # Log summary
+        total_prompts = len(results)
+        total_llm_calls = sum(len(r.llm_results) for r in results)
+        cached_calls = sum(1 for r in results for lr in r.llm_results.values() if lr.cached)
+        error_calls = sum(1 for r in results for lr in r.llm_results.values() if lr.error)
+        
+        self.logger.info(f"Batch execution complete: {total_prompts} prompts, "
+                        f"{len(llms)} LLMs, {total_llm_calls} total calls, "
+                        f"{cached_calls} cached, {error_calls} errors")
+        
+        return results
+    
+    def clear_cache(self) -> None:
+        """Clear all cached responses"""
+        try:
+            self.cache.clear()
+            self.logger.info("Cache cleared successfully")
+        except Exception as e:
+            self.logger.error(f"Error clearing cache: {e}")
+    
+    def execute_batch_single_llm(self, prompts: List[Prompt], llm_config: LLMConfig,
+                                settings: EvaluationSettings, show_progress: bool = True) -> List[PromptResult]:
+        """Execute a batch of prompts with a single LLM (backward compatibility)"""
         results = []
         
         # Create progress bar if requested
-        iterator = tqdm(prompts, desc="Executing prompts") if show_progress else prompts
+        iterator = tqdm(prompts, desc=f"Executing prompts with {llm_config.name}") if show_progress else prompts
         
         for prompt in iterator:
-            result = self.execute_single_prompt(prompt, settings)
+            result = self.execute_single_prompt(prompt, llm_config, settings)
             results.append(result)
             
             if show_progress and isinstance(iterator, tqdm):
@@ -161,18 +254,10 @@ class PromptExecutor:
         cached = sum(1 for r in results if r.cached)
         errors = sum(1 for r in results if r.error)
         
-        self.logger.info(f"Batch execution complete: {total} prompts, "
+        self.logger.info(f"Batch execution complete for {llm_config.name}: {total} prompts, "
                         f"{cached} cached, {errors} errors")
         
         return results
-    
-    def clear_cache(self) -> None:
-        """Clear all cached responses"""
-        try:
-            self.cache.clear()
-            self.logger.info("Cache cleared successfully")
-        except Exception as e:
-            self.logger.error(f"Error clearing cache: {e}")
     
     def get_cache_stats(self) -> Dict[str, any]:
         """Get cache statistics"""

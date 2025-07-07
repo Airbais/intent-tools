@@ -112,6 +112,19 @@ class ToolDataLoader:
         if 'discovered_intents' in data and 'by_section' in data:
             return 'intentcrawler'
         
+        # LLM Evaluator detection - supports both old and new formats
+        if 'evaluation_results' in data and 'aggregate_metrics' in data and 'brand_info' in data:
+            return 'llmevaluator'
+        # New multi-LLM format
+        if 'metadata' in data and 'llm_metrics' in data and 'brand_info' in data:
+            return 'llmevaluator'
+        
+        # GEO Evaluator detection
+        if 'overall_score' in data and 'analysis_summary' in data and 'recommendations' in data:
+            metadata = data.get('metadata', {})
+            if metadata.get('tool_name') == 'geoevaluator':
+                return 'geoevaluator'
+        
         # Future tool types can be detected here
         # Example:
         # if 'sentiment_analysis' in data:
@@ -128,6 +141,10 @@ class ToolDataLoader:
         
         if tool_type == 'intentcrawler':
             return self._standardize_intentcrawler_data(data)
+        elif tool_type == 'llmevaluator':
+            return self._standardize_llmevaluator_data(data)
+        elif tool_type == 'geoevaluator':
+            return self._standardize_geoevaluator_data(data)
         
         # Future tool standardization can be added here
         # elif tool_type == 'sentimentanalyzer':
@@ -146,6 +163,96 @@ class ToolDataLoader:
             'total_intents_discovered': data.get('total_intents_discovered', len(data.get('discovered_intents', []))),
             'extraction_methods_used': data.get('extraction_methods_used', ['unknown']),
             '_metadata': data.get('_metadata', {})
+        }
+        
+        # Copy any additional fields
+        for key, value in data.items():
+            if key not in standardized:
+                standardized[key] = value
+        
+        return standardized
+    
+    def _standardize_llmevaluator_data(self, data: Dict) -> Dict:
+        """Standardize llmevaluator data format - supports both old and new multi-LLM formats"""
+        
+        # Check if this is the new multi-LLM format
+        if 'metadata' in data and 'llm_metrics' in data:
+            # New multi-LLM format
+            standardized = {
+                'evaluation_results': self._convert_multi_llm_to_standard(data),
+                'aggregate_metrics': data.get('aggregate_metrics', {}),
+                'brand_info': data.get('brand_info', {}),
+                'insights': data.get('insights', {}),
+                'evaluation_summary': data.get('evaluation_summary', {}),
+                '_metadata': {
+                    'tool_type': 'llmevaluator',
+                    'format': 'multi_llm',
+                    'llms': data.get('metadata', {}).get('llms', []),
+                    'comparative_metrics': data.get('comparative_metrics', {})
+                }
+            }
+        else:
+            # Old single-LLM format
+            standardized = {
+                'evaluation_results': data.get('evaluation_results', []),
+                'aggregate_metrics': data.get('aggregate_metrics', {}),
+                'brand_info': data.get('brand_info', {}),
+                'insights': data.get('insights', []),
+                'evaluation_summary': data.get('evaluation_summary', {}),
+                '_metadata': {
+                    'tool_type': 'llmevaluator',
+                    'format': 'single_llm'
+                }
+            }
+        
+        # Copy any additional fields
+        for key, value in data.items():
+            if key not in standardized:
+                standardized[key] = value
+        
+        return standardized
+    
+    def _convert_multi_llm_to_standard(self, data: Dict) -> List[Dict]:
+        """Convert multi-LLM detailed results to standard evaluation_results format"""
+        evaluation_results = []
+        
+        detailed_results = data.get('detailed_results', [])
+        llm_metrics = data.get('llm_metrics', {})
+        
+        for prompt_data in detailed_results:
+            # For each LLM response to this prompt
+            for llm_name, response_data in prompt_data.get('responses', {}).items():
+                eval_result = {
+                    'prompt': prompt_data.get('prompt', ''),
+                    'category': prompt_data.get('category', ''),
+                    'llm_name': llm_name,
+                    'response_analysis': response_data.get('analysis', {}),
+                    'response_excerpt': response_data.get('response', ''),
+                    'cached': response_data.get('cached', False),
+                    'error': response_data.get('error', None),
+                    'timestamp': data.get('metadata', {}).get('timestamp', '')
+                }
+                evaluation_results.append(eval_result)
+        
+        return evaluation_results
+    
+    def _standardize_geoevaluator_data(self, data: Dict) -> Dict:
+        """Standardize geoevaluator data format"""
+        
+        standardized = {
+            'overall_score': data.get('overall_score', {}),
+            'analysis_summary': data.get('analysis_summary', {}),
+            'recommendations': data.get('recommendations', []),
+            'page_scores': data.get('page_scores', []),
+            'benchmarks': data.get('benchmarks', {}),
+            '_metadata': {
+                'tool_type': 'geoevaluator',
+                'website_url': data.get('metadata', {}).get('website_url', ''),
+                'website_name': data.get('metadata', {}).get('website_name', ''),
+                'pages_analyzed': data.get('metadata', {}).get('pages_analyzed', 0),
+                'timestamp': data.get('metadata', {}).get('timestamp', ''),
+                'analysis_duration': data.get('metadata', {}).get('analysis_duration_seconds', 0)
+            }
         }
         
         # Copy any additional fields
@@ -206,6 +313,14 @@ class ToolDataLoader:
                 'total_pages': data.get('total_pages_analyzed', 0),
                 'total_intents': data.get('total_intents_discovered', 0),
                 'sections': len(data.get('by_section', {}))
+            }
+        elif tool_type == 'geoevaluator':
+            overall_score = data.get('overall_score', {})
+            return {
+                'total_score': overall_score.get('total_score', 0),
+                'grade': overall_score.get('grade', 'Unknown'),
+                'pages_analyzed': data.get('_metadata', {}).get('pages_analyzed', 0),
+                'recommendations': len(data.get('recommendations', []))
             }
         
         # Default stats for unknown tools

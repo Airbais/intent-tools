@@ -1,0 +1,138 @@
+{
+  "metadata": {
+    "timestamp": "2025-07-05T07:56:22.895740",
+    "tool_name": "geoevaluator",
+    "tool_version": "1.0.0",
+    "website_url": "https://gofastmcp.com",
+    "website_name": "FastMCP",
+    "pages_analyzed": 5,
+    "analysis_duration_seconds": 0,
+    "configuration": {
+      "max_pages": 5,
+      "crawl_depth": 3,
+      "analysis_weights": {
+        "structural_html": 0.25,
+        "content_organization": 0.3,
+        "token_efficiency": 0.2,
+        "llm_technical": 0.15,
+        "accessibility": 0.1
+      }
+    }
+  },
+  "overall_score": {
+    "total_score": 70.7,
+    "grade": "Fair",
+    "category_scores": {
+      "structural_html": 100.0,
+      "content_organization": 90.0,
+      "token_efficiency": 5.9,
+      "llm_technical": 50.0,
+      "accessibility": 100.0
+    }
+  },
+  "analysis_summary": {
+    "pages_analyzed": 5,
+    "avg_semantic_html_usage": 1.0,
+    "avg_content_to_markup_ratio": 0.02932934427306571,
+    "llms_txt_present": false,
+    "structured_data_coverage": 1.0,
+    "alt_text_coverage": 1.0
+  },
+  "recommendations": [
+    {
+      "title": "Implement llms.txt File",
+      "description": "No llms.txt file detected. This is crucial for LLM optimization.",
+      "priority": "high",
+      "category": "llm_technical",
+      "pages_affected": 1,
+      "estimated_impact": "high"
+    },
+    {
+      "title": "Improve Content-to-Markup Ratio",
+      "description": "Average content-to-markup ratio is 2.9%, target >30%",
+      "priority": "medium",
+      "category": "token_efficiency",
+      "pages_affected": 5,
+      "estimated_impact": "medium"
+    }
+  ],
+  "page_scores": [
+    {
+      "url": "https://gofastmcp.com/",
+      "title": "Welcome to FastMCP 2.0! - FastMCP",
+      "overall_score": 70.7,
+      "category_scores": {
+        "structural_html": 100.0,
+        "content_organization": 90.0,
+        "token_efficiency": 5.865868854613142,
+        "llm_technical": 50.0,
+        "accessibility": 100.0
+      }
+    },
+    {
+      "url": "https://gofastmcp.com/changelog",
+      "title": "Changelog - FastMCP",
+      "overall_score": 70.7,
+      "category_scores": {
+        "structural_html": 100.0,
+        "content_organization": 90.0,
+        "token_efficiency": 5.865868854613142,
+        "llm_technical": 50.0,
+        "accessibility": 100.0
+      }
+    },
+    {
+      "url": "https://gofastmcp.com/updates",
+      "title": "FastMCP Updates - FastMCP",
+      "overall_score": 70.7,
+      "category_scores": {
+        "structural_html": 100.0,
+        "content_organization": 90.0,
+        "token_efficiency": 5.865868854613142,
+        "llm_technical": 50.0,
+        "accessibility": 100.0
+      }
+    },
+    {
+      "url": "https://gofastmcp.com/clients/client",
+      "title": "The FastMCP Client - FastMCP",
+      "overall_score": 70.7,
+      "category_scores": {
+        "structural_html": 100.0,
+        "content_organization": 90.0,
+        "token_efficiency": 5.865868854613142,
+        "llm_technical": 50.0,
+        "accessibility": 100.0
+      }
+    },
+    {
+      "url": "https://gofastmcp.com/clients/elicitation",
+      "title": "User Elicitation - FastMCP",
+      "overall_score": 70.7,
+      "category_scores": {
+        "structural_html": 100.0,
+        "content_organization": 90.0,
+        "token_efficiency": 5.865868854613142,
+        "llm_technical": 50.0,
+        "accessibility": 100.0
+      }
+    }
+  ],
+  "benchmarks": {
+    "score": 70.7,
+    "industry_average": 65.0,
+    "percentile_rank": 60,
+    "top_quartile_threshold": 80.0,
+    "top_decile_threshold": 90.0,
+    "leader_threshold": 95.0,
+    "vs_industry_average": 5.7,
+    "performance_tier": "Average"
+  },
+  "crawl_stats": {
+    "pages_crawled": 5,
+    "pages_failed": 0,
+    "total_size_bytes": 3795779,
+    "crawl_start_time": "2025-07-05T07:56:15.748072",
+    "crawl_duration": 7.100865
+  }
+}

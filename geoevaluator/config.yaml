@@ -1,0 +1,61 @@
+# GEO Evaluator Configuration
+# Default configuration for analyzing FastMCP website
+
+website:
+  url: "https://gofastmcp.com"
+  name: "FastMCP"
+  max_pages: 50              # Maximum number of pages to analyze
+  crawl_depth: 3             # Maximum link depth from starting URL
+  excluded_paths:            # Paths to exclude from analysis
+    - "/admin"
+    - "/api"
+    - "/wp-admin"
+  follow_redirects: true     # Follow HTTP redirects
+
+analysis:
+  weights:                   # Scoring weights (must sum to 1.0)
+    structural_html: 0.25    # HTML structure and semantic markup
+    content_organization: 0.30  # Content readability and organization
+    token_efficiency: 0.20   # Content-to-markup ratio and density
+    llm_technical: 0.15      # LLM-specific optimizations
+    accessibility: 0.10      # Content accessibility and clarity
+  
+  thresholds:
+    semantic_html_excellent: 0.80  # Threshold for excellent semantic HTML usage
+    semantic_html_good: 0.60       # Threshold for good semantic HTML usage
+    semantic_html_fair: 0.40       # Threshold for fair semantic HTML usage
+    readability_optimal_min: 15    # Optimal minimum words per sentence
+    readability_optimal_max: 20    # Optimal maximum words per sentence
+    content_markup_ratio_excellent: 0.70  # Excellent content-to-markup ratio
+    content_markup_ratio_good: 0.50       # Good content-to-markup ratio
+    content_markup_ratio_fair: 0.30       # Fair content-to-markup ratio
+  
+  llms_txt:
+    required: true           # Require llms.txt file presence
+    validate_format: true    # Validate llms.txt format
+    check_completeness: true # Check llms.txt completeness
+  
+  schema_markup:
+    organization_required: true    # Organization schema required
+    webpage_recommended: true      # WebPage schema recommended
+    article_recommended: true      # Article schema recommended
+    faq_recommended: true          # FAQ schema recommended
+
+crawling:
+  delay_seconds: 1.0         # Delay between requests (be respectful!)
+  timeout_seconds: 30        # Request timeout
+  max_retries: 3             # Maximum retry attempts
+  user_agent: "GEO-Evaluator/1.0 (+https://airbais.com/tools)"
+  respect_robots_txt: true   # Respect robots.txt directives
+  follow_sitemaps: true      # Use sitemap.xml for URL discovery
+  max_file_size_mb: 10       # Maximum file size to download
+
+output:
+  formats:                   # Output formats to generate
+    - "json"                 # Machine-readable results
+    - "dashboard"            # Dashboard integration
+  export_path: "./results"   # Directory for output files
+  include_recommendations: true    # Include optimization recommendations
+  detail_level: "comprehensive"    # Level of detail in reports
+  generate_html_report: true       # Generate human-readable HTML report
+  include_page_details: true       # Include individual page analysis

@@ -88,6 +88,98 @@ class ReportGenerator:
         
         return dashboard_data
     
+    def generate_multi_llm_dashboard_data(self,
+                                        config: ConfigurationManager,
+                                        results: List['MultiLLMPromptResult'],
+                                        analyses: Dict[str, Dict[str, ResponseAnalysis]],
+                                        multi_metrics: 'MultiLLMMetrics',
+                                        insights: Dict[str, List[str]]) -> Dict[str, Any]:
+        """Generate dashboard-compatible data structure for multi-LLM evaluation"""
+        
+        # Build metadata
+        metadata = {
+            'timestamp': datetime.now().isoformat(),
+            'llms': [
+                {
+                    'name': llm.name,
+                    'provider': llm.provider,
+                    'model': llm.model
+                } for llm in config.llms
+            ],
+            'prompt_count': len(results),
+            'brand': config.brand_info.name
+        }
+        
+        # Build LLM-specific metrics
+        llm_metrics_dict = {}
+        for llm_name, metrics in multi_metrics.llm_metrics.items():
+            llm_metrics_dict[llm_name] = MetricsCalculator().to_dict(metrics)
+        
+        # Build comparative metrics (if multiple LLMs)
+        comparative_metrics = {
+            'enabled': multi_metrics.comparative_metrics.enabled,
+            'consensus_score': round(multi_metrics.comparative_metrics.consensus_score, 3),
+            'mention_rate_variance': round(multi_metrics.comparative_metrics.mention_rate_variance, 3),
+            'sentiment_alignment': round(multi_metrics.comparative_metrics.sentiment_alignment, 3),
+            'response_consistency': multi_metrics.comparative_metrics.response_consistency
+        }
+        
+        # Build aggregate metrics
+        aggregate_metrics = MetricsCalculator().to_dict(multi_metrics.aggregate_metrics)
+        
+        # Build detailed results
+        detailed_results = []
+        for result in results:
+            prompt_data = {
+                'prompt': result.prompt_text,
+                'category': result.category,
+                'responses': {}
+            }
+            
+            for llm_name, llm_result in result.llm_results.items():
+                if result.prompt_id in analyses and llm_name in analyses[result.prompt_id]:
+                    analysis = analyses[result.prompt_id][llm_name]
+                    
+                    prompt_data['responses'][llm_name] = {
+                        'response': llm_result.response[:500] + '...' if len(llm_result.response) > 500 else llm_result.response,
+                        'analysis': {
+                            'brand_mentions': analysis.brand_mentions,
+                            'website_mentions': analysis.website_mentions,
+                            'sentiment_score': round(analysis.sentiment_score, 3),
+                            'sentiment_label': analysis.sentiment_label,
+                            'mention_positions': analysis.mention_positions,
+                            'competitor_mentions': analysis.competitor_mentions
+                        },
+                        'cached': llm_result.cached,
+                        'error': llm_result.error
+                    }
+            
+            detailed_results.append(prompt_data)
+        
+        # Build complete dashboard data
+        dashboard_data = {
+            'metadata': metadata,
+            'llm_metrics': llm_metrics_dict,
+            'comparative_metrics': comparative_metrics,
+            'aggregate_metrics': aggregate_metrics,
+            'detailed_results': detailed_results,
+            'insights': insights,
+            'brand_info': {
+                'name': config.brand_info.name,
+                'website': config.brand_info.website,
+                'aliases': config.brand_info.aliases,
+                'competitors': config.brand_info.competitors
+            },
+            'evaluation_summary': {
+                'total_prompts_evaluated': len(results),
+                'llms_evaluated': len(config.llms),
+                'total_llm_calls': sum(len(r.llm_results) for r in results),
+                'categories_evaluated': list(set(r.category for r in results))
+            }
+        }
+        
+        return dashboard_data
+    
     def save_report(self, dashboard_data: Dict[str, Any], 
                    timestamp: Optional[datetime] = None) -> Path:
         """Save report to results directory with timestamp"""
@@ -115,13 +207,22 @@ class ReportGenerator:
                              results_dir: Path) -> None:
         """Save additional detailed results files"""
         
+        # Determine if this is a multi-LLM report
+        is_multi_llm = 'llm_metrics' in dashboard_data
+        
         # Save raw evaluation results
         raw_results_file = results_dir / 'raw_results.json'
         with open(raw_results_file, 'w', encoding='utf-8') as f:
-            json.dump(dashboard_data['evaluation_results'], f, indent=2, ensure_ascii=False)
+            if is_multi_llm:
+                json.dump(dashboard_data['detailed_results'], f, indent=2, ensure_ascii=False)
+            else:
+                json.dump(dashboard_data['evaluation_results'], f, indent=2, ensure_ascii=False)
         
         # Generate and save text report
-        text_report = self._generate_text_report(dashboard_data)
+        if is_multi_llm:
+            text_report = self._generate_multi_llm_text_report(dashboard_data)
+        else:
+            text_report = self._generate_text_report(dashboard_data)
         report_file = results_dir / 'evaluation_report.txt'
         with open(report_file, 'w', encoding='utf-8') as f:
             f.write(text_report)
@@ -202,5 +303,80 @@ class ReportGenerator:
         report.append("\n" + "=" * 60)
         report.append("END OF REPORT")
         report.append("=" * 60)
+        
+        return "\n".join(report)
+    
+    def _generate_multi_llm_text_report(self, dashboard_data: Dict[str, Any]) -> str:
+        """Generate human-readable text report for multi-LLM evaluation"""
+        metadata = dashboard_data['metadata']
+        llm_metrics = dashboard_data['llm_metrics']
+        comparative = dashboard_data['comparative_metrics']
+        aggregate = dashboard_data['aggregate_metrics']
+        brand_info = dashboard_data['brand_info']
+        summary = dashboard_data['evaluation_summary']
+        insights = dashboard_data.get('insights', {})
+        
+        report = []
+        report.append("=" * 80)
+        report.append(f"Multi-LLM Brand Evaluation Report for {brand_info['name']}")
+        report.append("=" * 80)
+        report.append(f"\nEvaluation Date: {metadata['timestamp']}")
+        report.append(f"Website: {brand_info['website']}")
+        report.append(f"\nLLMs Evaluated ({len(metadata['llms'])}):")
+        for llm in metadata['llms']:
+            report.append(f"  - {llm['name']}: {llm['provider']} ({llm['model']})")
+        
+        report.append(f"\nTotal Prompts: {summary['total_prompts_evaluated']}")
+        report.append(f"Total LLM Calls: {summary['total_llm_calls']}")
+        
+        # Per-LLM metrics
+        report.append("\n" + "=" * 80)
+        report.append("PER-LLM METRICS")
+        report.append("=" * 80)
+        
+        for llm_name, metrics in llm_metrics.items():
+            report.append(f"\n{llm_name.upper()}:")
+            report.append("-" * 40)
+            report.append(f"  Brand Mentions: {metrics['total_brand_mentions']}")
+            report.append(f"  Mention Rate: {metrics['mention_rate']:.2f} per prompt")
+            report.append(f"  Average Sentiment: {metrics['average_sentiment']:.3f}")
+            report.append(f"  Prompts with Mentions: {metrics['prompts_with_mentions']}/{metrics['total_prompts']}")
+        
+        # Comparative metrics
+        if comparative['enabled']:
+            report.append("\n" + "=" * 80)
+            report.append("COMPARATIVE METRICS")
+            report.append("=" * 80)
+            report.append(f"Consensus Score: {comparative['consensus_score']:.1%} (how often LLMs agree)")
+            report.append(f"Mention Rate Variance: {comparative['mention_rate_variance']:.3f}")
+            report.append(f"Sentiment Alignment: {comparative['sentiment_alignment']:.1%}")
+        
+        # Aggregate metrics
+        report.append("\n" + "=" * 80)
+        report.append("AGGREGATE METRICS (AVERAGED ACROSS ALL LLMS)")
+        report.append("=" * 80)
+        report.append(f"Average Mention Rate: {aggregate['mention_rate']:.2f}")
+        report.append(f"Average Sentiment: {aggregate['average_sentiment']:.3f}")
+        report.append(f"Total Brand Mentions (all LLMs): {aggregate['total_brand_mentions']}")
+        
+        # Insights
+        if insights:
+            report.append("\n" + "=" * 80)
+            report.append("KEY INSIGHTS")
+            report.append("=" * 80)
+            
+            if 'overall' in insights:
+                report.append("\nOverall:")
+                for insight in insights['overall']:
+                    report.append(f"  • {insight}")
+            
+            if 'comparative' in insights:
+                report.append("\nComparative:")
+                for insight in insights['comparative']:
+                    report.append(f"  • {insight}")
+        
+        report.append("\n" + "=" * 80)
+        report.append("END OF REPORT")
+        report.append("=" * 80)
         
         return "\n".join(report)

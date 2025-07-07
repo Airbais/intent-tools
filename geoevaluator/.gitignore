@@ -97,4 +97,4 @@ config.md
 debug_openai.py
 brand_test_config.md
 example_multi_llm_config.md
-llmevaluator.mdx
+/tests

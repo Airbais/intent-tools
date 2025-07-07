@@ -98,15 +98,22 @@ class ResponseAnalyzer:
             if matches:
                 analysis.competitor_mentions[competitor] = len(matches)
         
-        # Analyze sentiment
-        if use_llm_sentiment and self.llm_interface:
-            analysis.sentiment_score, analysis.sentiment_label = self._analyze_sentiment_llm(
-                response_text, result.prompt_text
-            )
+        # Analyze sentiment - focus on brand mentions if they exist
+        if brand_matches or website_matches:
+            # Brand mentioned - analyze sentiment around brand context
+            brand_contexts = self._extract_brand_contexts(response_text, brand_matches + website_matches)
+            if use_llm_sentiment and self.llm_interface:
+                analysis.sentiment_score, analysis.sentiment_label = self._analyze_brand_sentiment_llm(
+                    brand_contexts, result.prompt_text
+                )
+            else:
+                analysis.sentiment_score, analysis.sentiment_label = self._analyze_brand_sentiment_textblob(
+                    brand_contexts
+                )
         else:
-            analysis.sentiment_score, analysis.sentiment_label = self._analyze_sentiment_textblob(
-                response_text
-            )
+            # No brand mention - no brand-specific sentiment to analyze
+            analysis.sentiment_score = 0.0
+            analysis.sentiment_label = "not_mentioned"
         
         # Extract excerpt around first brand mention
         if brand_matches:
@@ -272,6 +279,96 @@ Respond only with valid JSON."""
             excerpt = excerpt + "..."
         
         return excerpt
+    
+    def _extract_brand_contexts(self, text: str, matches: List[re.Match], context_length: int = 200) -> List[str]:
+        """Extract context around each brand mention"""
+        contexts = []
+        
+        for match in matches:
+            start = max(0, match.start() - context_length)
+            end = min(len(text), match.end() + context_length)
+            context = text[start:end].strip()
+            if context:
+                contexts.append(context)
+        
+        return contexts
+    
+    def _analyze_brand_sentiment_textblob(self, brand_contexts: List[str]) -> Tuple[float, str]:
+        """Analyze sentiment of brand contexts using TextBlob"""
+        if not brand_contexts:
+            return 0.0, "not_mentioned"
+        
+        try:
+            # Analyze sentiment for each brand context
+            scores = []
+            for context in brand_contexts:
+                blob = TextBlob(context)
+                scores.append(blob.sentiment.polarity)
+            
+            # Average the sentiment scores
+            avg_score = sum(scores) / len(scores) if scores else 0.0
+            
+            # Classify sentiment
+            if avg_score > 0.1:
+                label = "positive"
+            elif avg_score < -0.1:
+                label = "negative"
+            else:
+                label = "neutral"
+            
+            return avg_score, label
+        
+        except Exception as e:
+            self.logger.error(f"Error in brand sentiment analysis: {e}")
+            return 0.0, "neutral"
+    
+    def _analyze_brand_sentiment_llm(self, brand_contexts: List[str], prompt_text: str) -> Tuple[float, str]:
+        """Analyze sentiment of brand contexts using LLM"""
+        if not brand_contexts:
+            return 0.0, "not_mentioned"
+        
+        if not self.llm_interface:
+            return self._analyze_brand_sentiment_textblob(brand_contexts)
+        
+        # Combine contexts for analysis
+        combined_context = "\n\n".join(brand_contexts)
+        
+        sentiment_prompt = f"""Analyze the sentiment toward the brand "{self.brand_info.name}" in the following text excerpts from an LLM response.
+
+Original question: {prompt_text}
+
+Text excerpts mentioning the brand:
+{combined_context[:1500]}
+
+Focus ONLY on the sentiment toward "{self.brand_info.name}" specifically. Ignore general sentiment about other topics.
+
+Provide a JSON response with:
+1. sentiment_score: A number between -1 (very negative toward the brand) and 1 (very positive toward the brand)
+2. sentiment_label: One of "positive", "negative", or "neutral"
+3. reasoning: Brief explanation focusing on brand-specific sentiment
+
+Respond only with valid JSON."""
+        
+        try:
+            llm_response = self.llm_interface.generate(
+                sentiment_prompt, 
+                temperature=0.3,  # Lower temperature for more consistent analysis
+                max_tokens=200
+            )
+            
+            # Parse JSON response
+            sentiment_data = json.loads(llm_response)
+            score = float(sentiment_data.get('sentiment_score', 0))
+            label = sentiment_data.get('sentiment_label', 'neutral')
+            
+            # Validate score range
+            score = max(-1, min(1, score))
+            
+            return score, label
+        
+        except Exception as e:
+            self.logger.warning(f"LLM brand sentiment analysis failed, falling back to TextBlob: {e}")
+            return self._analyze_brand_sentiment_textblob(brand_contexts)
     
     def batch_analyze(self, results: List[PromptResult], use_llm_sentiment: bool = True) -> Dict[str, ResponseAnalysis]:
         """Analyze a batch of responses"""
