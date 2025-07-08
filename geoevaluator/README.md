@@ -16,8 +16,11 @@ The GEO Evaluator analyzes websites across 5 key categories:
 
 - **Comprehensive Website Analysis**: Crawls websites respecting robots.txt and sitemaps
 - **Weighted Scoring Algorithm**: Produces scores from 0-100 with letter grades (Excellent to Very Poor)
+- **Individual Page Scoring**: Detailed analysis of each page with category-specific scores
 - **Actionable Recommendations**: Prioritized optimization suggestions with impact estimates
+- **Affected Pages Tracking**: See exactly which pages need attention for each recommendation
 - **Dashboard Integration**: Seamless integration with the master tools dashboard
+- **Auto-Launch Dashboard**: Dashboard automatically opens when using --dashboard flag
 - **Multiple Output Formats**: JSON, HTML reports, and dashboard-compatible data
 - **Respectful Crawling**: Configurable delays, timeout handling, and robots.txt compliance
 
@@ -53,12 +56,13 @@ python geoevaluator.py config.yaml
 
 ### Dashboard Integration
 ```bash
-# Run analysis and generate dashboard data
+# Run analysis and launch dashboard automatically
 python geoevaluator.py config.yaml --dashboard
 
-# View results in master dashboard
+# The dashboard will open automatically at http://127.0.0.1:8050
+# Or run dashboard manually later:
 cd ../dashboard
-python dashboard.py
+python run_dashboard.py
 ```
 
 ## Configuration
@@ -148,10 +152,11 @@ The tool automatically integrates with the master dashboard:
 
 Dashboard displays:
 - Overall GEO optimization score and grade
-- Category-by-category breakdown
-- Top optimization recommendations
-- Benchmark comparisons
-- Individual page scores
+- Category-by-category breakdown with visual indicators
+- Top optimization recommendations with affected pages
+- Industry benchmarks and performance tier
+- Individual page scores with drill-down capability
+- Side-by-side analysis summary and benchmarks (responsive layout)
 
 ## Understanding Scores
 
@@ -210,6 +215,11 @@ The tool provides prioritized recommendations:
 4. **Add structured data** - Implement Schema.org markup
 5. **Enhance content organization** - Break up long paragraphs, add lists
 6. **Improve alt text** - Add descriptive alternative text for images
+
+Each recommendation includes:
+- **Affected Pages List**: Clickable links to specific pages needing attention
+- **Impact Metrics**: Word count for content issues, ratio percentages for efficiency
+- **Priority Level**: High/Medium/Low with color-coded indicators
 
 ## Examples
 
