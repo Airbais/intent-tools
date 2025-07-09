@@ -223,7 +223,7 @@ Each recommendation includes:
 
 ## Examples
 
-### Analyzing FastMCP Website
+### Analyzing Airbais Website
 ```bash
 # Quick analysis
 python geoevaluator.py --url https://airbais.com --name "Airbais"
