@@ -66,4 +66,4 @@ output:
   keep_past_results: 7  # Number of past results to keep, -1 for all
   overwrite_today: true
 
-test_website: "https://gofastmcp.com/"
+test_website: "https://airbais.com/"

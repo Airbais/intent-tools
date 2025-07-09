@@ -29,8 +29,8 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Analyze FastMCP website with default settings
-  python geoevaluator.py --url https://gofastmcp.com --name "FastMCP"
+  # Analyze Airbais website with default settings
+  python geoevaluator.py --url https://airbais.com --name "Airbais"
   
   # Use a configuration file
   python geoevaluator.py config.yaml

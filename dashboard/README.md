@@ -45,7 +45,6 @@ tools/
 - **Unified Interface**: Consistent UI across all tools
 
 ### 🎨 Modern Design
-- **Airbais Design System**: Professional orange/gray color scheme
 - **Light/Dark Mode**: Toggle with persistent preference
 - **Responsive Layout**: Works on desktop and mobile
 - **Interactive Charts**: Plotly-powered visualizations

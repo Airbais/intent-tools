@@ -281,8 +281,8 @@ class ConfigurationManager:
         except Exception as e:
             raise ValueError(f"Error saving configuration: {e}")
     
-    def create_example_config(self, output_path: str, url: str = "https://gofastmcp.com", 
-                             name: str = "FastMCP") -> None:
+    def create_example_config(self, output_path: str, url: str = "https://airbais.com", 
+                             name: str = "Airbais") -> None:
         """Create an example configuration file."""
         
         config = self.get_default_config()

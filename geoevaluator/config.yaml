@@ -1,9 +1,9 @@
 # GEO Evaluator Configuration
-# Default configuration for analyzing FastMCP website
+# Default configuration for analyzing Airbais website
 
 website:
-  url: "https://gofastmcp.com"
-  name: "FastMCP"
+  url: "https://airbais.com"
+  name: "Airbais"
   max_pages: 50              # Maximum number of pages to analyze
   crawl_depth: 3             # Maximum link depth from starting URL
   excluded_paths:            # Paths to exclude from analysis

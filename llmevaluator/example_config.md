@@ -1,16 +1,16 @@
-# FastMCP Brand Evaluation Configuration
+# Airbais Brand Evaluation Configuration
 
 ## Brand Information
-- **Name**: FastMCP
-- **Website**: https://gofastmcp.com
+- **Name**: Airbais
+- **Website**: https://airbais.com
 - **Aliases**: 
-  - Fast MCP
-  - FastMCP.com
-  - Fast Model Context Protocol
+  - Airbais
+  - airbais.com
 - **Competitors**: 
-  - Generic MCP Solutions
-  - Traditional API Approaches
-  - Direct LLM Integration
+  - Context Engineering Solutions
+  - SEO to GEO
+  - Intent monitoring
+  - AI Optimization
 
 ## Evaluation Prompts
 
