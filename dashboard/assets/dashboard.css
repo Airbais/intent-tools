@@ -813,3 +813,44 @@ table a:hover {
 [data-theme="dark"] .recommendation-item h4 {
   color: inherit !important; /* Keep the priority color */
 }
+
+/* Dark mode chart background fixes */
+[data-theme="dark"] .js-plotly-plot .bg {
+  fill: transparent !important;
+}
+
+[data-theme="dark"] .js-plotly-plot .plot-bg {
+  fill: transparent !important;
+}
+
+[data-theme="dark"] .js-plotly-plot .paper-bg {
+  fill: transparent !important;
+}
+
+/* Force all chart text to use theme colors in dark mode */
+[data-theme="dark"] .js-plotly-plot text,
+[data-theme="dark"] .js-plotly-plot .xtick text,
+[data-theme="dark"] .js-plotly-plot .ytick text,
+[data-theme="dark"] .js-plotly-plot .legendtext,
+[data-theme="dark"] .js-plotly-plot .annotation text,
+[data-theme="dark"] .js-plotly-plot .hoverlabel text,
+[data-theme="dark"] .js-plotly-plot .g-xtitle text,
+[data-theme="dark"] .js-plotly-plot .g-ytitle text {
+  fill: #F5F5F4 !important;
+  color: #F5F5F4 !important;
+}
+
+/* Auto dark mode chart text fixes */
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .js-plotly-plot text,
+  html:not([data-theme="light"]) .js-plotly-plot .xtick text,
+  html:not([data-theme="light"]) .js-plotly-plot .ytick text,
+  html:not([data-theme="light"]) .js-plotly-plot .legendtext,
+  html:not([data-theme="light"]) .js-plotly-plot .annotation text,
+  html:not([data-theme="light"]) .js-plotly-plot .hoverlabel text,
+  html:not([data-theme="light"]) .js-plotly-plot .g-xtitle text,
+  html:not([data-theme="light"]) .js-plotly-plot .g-ytitle text {
+    fill: #F5F5F4 !important;
+    color: #F5F5F4 !important;
+  }
+}

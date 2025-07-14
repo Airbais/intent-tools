@@ -125,6 +125,12 @@ class ToolDataLoader:
             if metadata.get('tool_name') == 'geoevaluator':
                 return 'geoevaluator'
         
+        # LLMS.txt Generator detection
+        if 'generation_summary' in data and 'site_analysis' in data:
+            metadata = data.get('metadata', {})
+            if metadata.get('tool_name') == 'llmstxtgenerator':
+                return 'llmstxtgenerator'
+        
         # Future tool types can be detected here
         # Example:
         # if 'sentiment_analysis' in data:
@@ -145,6 +151,8 @@ class ToolDataLoader:
             return self._standardize_llmevaluator_data(data)
         elif tool_type == 'geoevaluator':
             return self._standardize_geoevaluator_data(data)
+        elif tool_type == 'llmstxtgenerator':
+            return self._standardize_llmstxtgenerator_data(data)
         
         # Future tool standardization can be added here
         # elif tool_type == 'sentimentanalyzer':
@@ -262,6 +270,34 @@ class ToolDataLoader:
         
         return standardized
     
+    def _standardize_llmstxtgenerator_data(self, data: Dict) -> Dict:
+        """Standardize llmstxtgenerator data format"""
+        
+        metadata = data.get('metadata', {})
+        generation_summary = data.get('generation_summary', {})
+        site_analysis = data.get('site_analysis', {})
+        
+        standardized = {
+            'generation_summary': generation_summary,
+            'site_analysis': site_analysis,
+            'files_generated': data.get('files_generated', {}),
+            '_metadata': {
+                'tool_type': 'llmstxtgenerator',
+                'website_url': metadata.get('website_url', ''),
+                'website_name': metadata.get('website_name', ''),
+                'timestamp': metadata.get('timestamp', ''),
+                'configuration': metadata.get('configuration', {}),
+                'tool_version': metadata.get('tool_version', '1.0.0')
+            }
+        }
+        
+        # Copy any additional fields
+        for key, value in data.items():
+            if key not in standardized:
+                standardized[key] = value
+        
+        return standardized
+    
     def get_available_data(self) -> Dict[str, List[str]]:
         """Get all available tool data organized by tool"""
         available = {}
@@ -321,6 +357,16 @@ class ToolDataLoader:
                 'grade': overall_score.get('grade', 'Unknown'),
                 'pages_analyzed': data.get('_metadata', {}).get('pages_analyzed', 0),
                 'recommendations': len(data.get('recommendations', []))
+            }
+        elif tool_type == 'llmstxtgenerator':
+            generation_summary = data.get('generation_summary', {})
+            site_analysis = data.get('site_analysis', {})
+            return {
+                'pages_crawled': generation_summary.get('pages_crawled', 0),
+                'sections_detected': generation_summary.get('sections_detected', 0),
+                'total_links': generation_summary.get('total_links_generated', 0),
+                'files_generated': generation_summary.get('files_generated', 0),
+                'success_rate': round(generation_summary.get('success_rate', 0), 1)
             }
         
         # Default stats for unknown tools

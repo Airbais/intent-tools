@@ -1,0 +1,73 @@
+# LLMS.txt Generator Configuration
+
+website:
+  url: "https://jcrew.com"
+  # Name of the site/project (if not auto-detected)
+  name: null
+  # Short description (if not auto-detected)
+  description: null
+
+generation:
+  # Maximum number of pages to crawl
+  max_pages: 100
+  # Maximum depth for crawling
+  max_depth: 3
+  # Include these URL patterns (regex)
+  include_patterns:
+    - ".*"
+  # Exclude these URL patterns (regex)
+  exclude_patterns:
+    - ".*\\.pdf$"
+    - ".*\\.zip$"
+    - ".*\\.tar\\.gz$"
+    - ".*/assets/.*"
+    - ".*/static/.*"
+  # Minimum pages required for a section to be included
+  min_pages_per_section: 2
+  # Filter out common generic URL segments
+  ignore_segments:
+    - "p"
+    - "c"
+    - "s"
+    - "id"
+    - "category"
+    - "page"
+  # Maximum number of links per section
+  max_links_per_section: 20
+
+analysis:
+  # Use AI to generate descriptions
+  use_ai_descriptions: true
+  # AI model for generating descriptions
+  ai_model: "gpt-4o-mini"
+  # Extract meta descriptions
+  extract_meta: true
+  # Extract page headings
+  extract_headings: true
+
+output:
+  # Output directory
+  directory: "results"
+  # Keep past results
+  keep_past_results: true
+  # Generate detailed report
+  generate_report: true
+  # Output formats
+  formats:
+    - "txt"
+    - "markdown"
+    - "json"
+
+crawling:
+  # Request timeout in seconds
+  timeout: 30
+  # User agent string
+  user_agent: "LLMS.txt Generator Bot (https://airbais.com)"
+  # Delay between requests (seconds)
+  delay: 0.5
+  # Follow redirects
+  follow_redirects: true
+  # Verify SSL certificates
+  verify_ssl: true
+  # Maximum retries
+  max_retries: 3

@@ -287,6 +287,35 @@ class MasterDashboard:
                 ], className="stat-card")
             ]
         
+        elif tool_type == 'llmstxtgenerator':
+            generation_summary = data.get('generation_summary', {})
+            pages_crawled = generation_summary.get('pages_crawled', 0)
+            sections_detected = generation_summary.get('sections_detected', 0)
+            total_links = generation_summary.get('total_links_generated', 0)
+            files_generated = generation_summary.get('files_generated', 0)
+            
+            return [
+                html.Div([
+                    html.Div(str(pages_crawled), className="stat-number"),
+                    html.Div("Pages Crawled", className="stat-label")
+                ], className="stat-card"),
+                
+                html.Div([
+                    html.Div(str(sections_detected), className="stat-number"),
+                    html.Div("Sections Found", className="stat-label")
+                ], className="stat-card"),
+                
+                html.Div([
+                    html.Div(str(total_links), className="stat-number"),
+                    html.Div("Links Generated", className="stat-label")
+                ], className="stat-card"),
+                
+                html.Div([
+                    html.Div(str(files_generated), className="stat-number"),
+                    html.Div("Files Created", className="stat-label")
+                ], className="stat-card")
+            ]
+        
         # Default stats for unknown tools
         return [
             html.Div([
@@ -304,6 +333,8 @@ class MasterDashboard:
             return self._generate_llmevaluator_content(data)
         elif tool_type == 'geoevaluator':
             return self._generate_geoevaluator_content(data)
+        elif tool_type == 'llmstxtgenerator':
+            return self._generate_llmstxtgenerator_content(data)
         
         # Default content for unknown tools
         return html.Div([
@@ -1058,6 +1089,157 @@ class MasterDashboard:
         
         if pages_section:
             sections.append(pages_section)
+        
+        return html.Div(sections)
+    
+    def _generate_llmstxtgenerator_content(self, data: Dict) -> html.Div:
+        """Generate content specific to llmstxtgenerator results"""
+        
+        metadata = data.get('_metadata', {})
+        generation_summary = data.get('generation_summary', {})
+        site_analysis = data.get('site_analysis', {})
+        files_generated = data.get('files_generated', {})
+        
+        website_url = metadata.get('website_url', '')
+        website_name = metadata.get('website_name', '')
+        
+        sections = []
+        
+        # Generation Summary
+        summary_content = [
+            html.H3("Generation Summary"),
+            html.P([html.Strong("Website: "), html.A(website_name or website_url, href=website_url, target="_blank")]),
+            html.P([html.Strong("Pages Crawled: "), str(generation_summary.get('pages_crawled', 0))]),
+            html.P([html.Strong("Sections Detected: "), str(generation_summary.get('sections_detected', 0))]),
+            html.P([html.Strong("Total Links Generated: "), str(generation_summary.get('total_links_generated', 0))]),
+            html.P([html.Strong("Success Rate: "), f"{generation_summary.get('success_rate', 0):.1f}%"]),
+            html.P([html.Strong("Max Depth Reached: "), str(generation_summary.get('max_depth_reached', 0))])
+        ]
+        
+        # Generated Files
+        files_content = [html.H3("Generated Files")]
+        
+        file_status = [
+            ("LLMS.txt File", files_generated.get('llms_txt', False)),
+            ("Markdown Version", files_generated.get('llms_md', False)),
+            ("JSON Data", files_generated.get('llms_json', False)),
+            ("Generation Report", files_generated.get('generation_report', False))
+        ]
+        
+        for file_name, status in file_status:
+            status_icon = "✅" if status else "❌"
+            files_content.append(html.P([
+                html.Span(status_icon, style={'margin-right': '0.5rem'}),
+                html.Strong(file_name),
+                html.Span(" - Generated" if status else " - Not Generated", 
+                         style={'color': 'green' if status else 'red'})
+            ]))
+        
+        # Configuration Used
+        config = metadata.get('configuration', {})
+        config_content = [
+            html.H3("Configuration Used"),
+            html.P([html.Strong("Max Pages: "), str(config.get('max_pages', 'N/A'))]),
+            html.P([html.Strong("Max Depth: "), str(config.get('max_depth', 'N/A'))]),
+            html.P([html.Strong("AI Descriptions: "), "Enabled" if config.get('ai_descriptions', False) else "Disabled"]),
+            html.P([html.Strong("Output Formats: "), ", ".join(config.get('output_formats', []))])
+        ]
+        
+        # Create responsive horizontal layout for these three sections
+        horizontal_sections = html.Div([
+            html.Div(summary_content, className="card", style={'flex': '1', 'min-width': '300px'}),
+            html.Div(files_content, className="card", style={'flex': '1', 'min-width': '300px'}),
+            html.Div(config_content, className="card", style={'flex': '1', 'min-width': '300px'})
+        ], style={
+            'display': 'flex',
+            'gap': '1rem',
+            'margin-bottom': '1rem',
+            'flex-wrap': 'wrap'
+        })
+        
+        sections.append(horizontal_sections)
+        
+        # Site Structure Analysis
+        section_counts = site_analysis.get('section_counts', {})
+        if section_counts:
+            # Create a bar chart for sections
+            fig_sections = go.Figure(data=[
+                go.Bar(x=list(section_counts.keys()), 
+                       y=list(section_counts.values()),
+                       marker_color='#F78D1F')
+            ])
+            fig_sections.update_layout(
+                title="Links Generated by Section",
+                xaxis_title="Section",
+                yaxis_title="Number of Links",
+                template="plotly_white",
+                plot_bgcolor="rgba(0,0,0,0)",
+                paper_bgcolor="rgba(0,0,0,0)",
+                font=dict(family="Inter, sans-serif", color="#1C1917"),
+                title_font=dict(color="#1C1917"),
+                xaxis=dict(color="#1C1917"),
+                yaxis=dict(color="#1C1917")
+            )
+            
+            sections.append(html.Div([
+                html.H3("Site Structure Analysis"),
+                dcc.Graph(figure=fig_sections)
+            ], className="card"))
+        
+        # Content Categories
+        content_categories = site_analysis.get('content_categories', {})
+        if content_categories:
+            # Create a pie chart for content categories
+            fig_categories = go.Figure(data=[
+                go.Pie(labels=list(content_categories.keys()), 
+                       values=list(content_categories.values()),
+                       marker=dict(colors=['#F78D1F', '#FFA940', '#D97706', '#A8A29E', '#78716C']))
+            ])
+            fig_categories.update_layout(
+                title="Content Distribution by Category",
+                template="plotly_white",
+                plot_bgcolor="rgba(0,0,0,0)",
+                paper_bgcolor="rgba(0,0,0,0)",
+                font=dict(family="Inter, sans-serif", color="#1C1917"),
+                title_font=dict(color="#1C1917")
+            )
+            
+            sections.append(html.Div([
+                html.H3("Content Categories"),
+                dcc.Graph(figure=fig_categories)
+            ], className="card"))
+        
+        
+        # Sections Detail
+        sections_data = site_analysis.get('sections', {})
+        if sections_data:
+            sections_detail = [html.H3("Generated Sections Detail")]
+            
+            for section_name, links in sections_data.items():
+                if links:
+                    section_content = [
+                        html.H4(f"{section_name.capitalize()} ({len(links)} links)"),
+                        html.Ul([
+                            html.Li([
+                                html.A(link.get('title', 'Untitled'), 
+                                      href=link.get('url', '#'), 
+                                      target="_blank",
+                                      style={'color': 'var(--primary-orange)', 'text-decoration': 'none'}),
+                                html.Span(f" - {link.get('description', 'No description')[:100]}{'...' if len(link.get('description', '')) > 100 else ''}", 
+                                         style={'color': 'var(--text-muted)', 'font-size': '0.9em'})
+                            ], style={'margin': '0.25rem 0'})
+                            for link in links[:10]  # Show first 10 links
+                        ])
+                    ]
+                    
+                    if len(links) > 10:
+                        section_content.append(html.P(f"... and {len(links) - 10} more links", 
+                                                     style={'color': 'var(--text-muted)', 'font-style': 'italic'}))
+                    
+                    sections_detail.extend(section_content)
+                    sections_detail.append(html.Hr())
+            
+            sections.append(html.Div(sections_detail, className="card"))
         
         return html.Div(sections)
     
