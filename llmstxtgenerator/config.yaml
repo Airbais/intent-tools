@@ -1,7 +1,7 @@
 # LLMS.txt Generator Configuration
 
 website:
-  url: "https://jcrew.com"
+  url: "https://yoursite.com"
   # Name of the site/project (if not auto-detected)
   name: null
   # Short description (if not auto-detected)
