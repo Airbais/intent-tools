@@ -1,0 +1,7 @@
+# LLM Evaluator Configuration
+
+# Display name for the dashboard dropdown
+display_name: "LLM Evaluator"
+
+# Note: This tool uses configuration files in the configs/ directory for evaluation settings
+# See example_config.md and example_multi_llm_config.md for detailed configuration options

@@ -1,0 +1,156 @@
+# GRASP Content Quality Evaluator Configuration
+
+# Display name for the dashboard dropdown
+display_name: "GRASP Evaluator"
+
+evaluator:
+  name: "GRASP Content Quality Evaluator"
+  version: "1.0.0"
+  description: "Evaluate content across five key dimensions: Grounded, Readable, Accurate, Structured, Polished"
+
+# Target websites to evaluate
+targets:
+  - url: "https://airbais.com"
+    name: "Airbais Website"
+    description: "Main company website"
+
+# Grounded metric configuration (40% weight)
+grounded:
+  # Customer intents to evaluate against
+  intents:
+    - "How can I determine if my website content is GEO optimized?"
+    - "How do I contact Airbais?"
+    - "What tools does Airbais offer?"
+    - "How do I get started using Airbais tools?"
+    - "How do Airbais tools help my business?"
+    - "What is the mission of Airbais?"
+    - "How is GEO different from SEO?"
+    - "What pricing options are available?"
+    - "How do I integrate Airbais tools into my workflow?"
+    - "What kind of results can I expect from using these tools?"
+  
+  # LLM settings for grounded evaluation
+  llm_model: "gpt-3.5-turbo"
+  max_content_length: 3000
+  batch_size: 3
+
+# Readable metric configuration (10% weight)
+readable:
+  # Target audience reading level
+  # Options: elementary, high_school, college, graduate, general_public
+  target_audience: "high_school"
+  
+  # Reading level grade ranges
+  grade_ranges:
+    elementary: [3, 6]
+    high_school: [7, 12]
+    college: [13, 16]
+    graduate: [17, 20]
+    general_public: [6, 8]
+  
+  # Tolerance for grade level matching (±1 grade level)
+  tolerance: 1
+
+# Accurate metric configuration (30% weight)
+accurate:
+  # Freshness thresholds in days
+  freshness_thresholds:
+    high: 180    # Content less than 6 months old
+    medium: 365  # Content less than 1 year old
+    # Older than 365 days = Low rating
+  
+  # Sources to check for dates (in order of priority)
+  date_sources:
+    - meta_tags
+    - schema_org
+    - time_elements
+    - content_patterns
+    - http_headers
+
+# Structured metric configuration (10% weight)
+structured:
+  # Enable/disable different structure checks
+  check_headings: true
+  check_semantic_elements: true
+  check_data_structures: true
+  check_schema_markup: true
+  
+  # Scoring weights for structure components
+  component_weights:
+    headings: 25
+    semantic_elements: 25
+    data_structures: 25
+    schema_markup: 25
+
+# Polished metric configuration (10% weight)
+polished:
+  # Grammar and style checking options
+  check_grammar: true
+  check_spelling: true
+  check_style: true
+  
+  # Use LLM for grammar checking (vs rule-based)
+  use_llm: true
+  llm_model: "gpt-3.5-turbo"
+  max_chunk_words: 800
+  
+  # Error rate thresholds for quality ratings
+  error_thresholds:
+    excellent: 0.01   # < 1% error rate
+    good: 0.03        # < 3% error rate
+    fair: 0.05        # < 5% error rate
+    poor: 0.10        # < 10% error rate
+    # > 10% = Very Poor
+
+# Overall scoring configuration
+scoring:
+  # Metric weights (must sum to 1.0)
+  weights:
+    grounded: 0.40
+    readable: 0.10
+    accurate: 0.30
+    structured: 0.10
+    polished: 0.10
+  
+  # Grade thresholds
+  grade_thresholds:
+    A: 90
+    B: 80
+    C: 70
+    D: 60
+    # < 60 = F
+
+# Output configuration
+output:
+  # Results directory (relative to project root)
+  results_dir: "results"
+  
+  # Output formats
+  formats:
+    - "json"          # Detailed JSON results
+    - "dashboard"     # Dashboard-compatible JSON
+    - "report"        # Human-readable report
+  
+  # Include detailed analysis in output
+  include_detailed_analysis: true
+
+# API and external service configuration
+api:
+  # Request timeouts
+  timeout_seconds: 30
+  
+  # Rate limiting
+  requests_per_minute: 60
+  
+  # Retry configuration
+  max_retries: 3
+  retry_delay: 1
+
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+  # Log to file
+  log_to_file: true
+  log_file: "grasp_evaluator.log"

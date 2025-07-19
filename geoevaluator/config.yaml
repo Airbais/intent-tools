@@ -1,6 +1,9 @@
 # GEO Evaluator Configuration
 # Default configuration for analyzing Airbais website
 
+# Display name for the dashboard dropdown
+display_name: "GEO Evaluator"
+
 website:
   url: "https://airbais.com"
   name: "Airbais"

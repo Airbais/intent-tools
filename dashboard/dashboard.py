@@ -22,23 +22,32 @@ class MasterDashboard:
         current_dir = Path(__file__).parent
         assets_folder = str(current_dir / 'assets')
         
-        self.app = dash.Dash(__name__, assets_folder=assets_folder)
+        self.app = dash.Dash(
+            __name__, 
+            assets_folder=assets_folder,
+            title="Airbais Dashboard",
+            meta_tags=[
+                {"name": "viewport", "content": "width=device-width, initial-scale=1"}
+            ]
+        )
+        
         self.data_loader = ToolDataLoader(tools_root_path)
         self.current_data = None
         self.logger = logging.getLogger(__name__)
         
         # Initialize available tools and runs
         self.available_tools = self.data_loader.discover_tools()
+        self.tools_with_display_names = self.data_loader.get_tools_with_display_names()
         self.available_data = self.data_loader.get_available_data()
         
         self.setup_layout()
         self.setup_callbacks()
     
     def setup_layout(self):
-        # Get available tools for dropdown
+        # Get available tools for dropdown with display names
         tool_options = []
-        for tool in self.available_tools:
-            tool_options.append({'label': tool.title().replace('_', ' '), 'value': tool})
+        for tool_name, display_name in self.tools_with_display_names:
+            tool_options.append({'label': display_name, 'value': tool_name})
         
         # If no tools available, show a message
         if not tool_options:
@@ -118,8 +127,11 @@ class MasterDashboard:
             
             run_options = [{'label': f"{run[0]} ({run[1].strftime('%B %d, %Y')})", 'value': run[0]} for run in runs]
             
+            # Get display name for the selected tool
+            display_name = self.data_loader.get_tool_display_name(selected_tool)
+            
             tool_info = html.Div([
-                html.P(f"Found {len(runs)} runs for {selected_tool.title()}", className="text-success"),
+                html.P(f"Found {len(runs)} runs for {display_name}", className="text-success"),
                 html.Small(f"Latest run: {runs[0][1].strftime('%B %d, %Y')}", className="text-muted")
             ])
             
@@ -199,8 +211,8 @@ class MasterDashboard:
                 html.Hr(),
                 html.H4("Available Tools:"),
                 html.Ul([
-                    html.Li(tool.title().replace('_', ' ')) for tool in self.available_tools
-                ] if self.available_tools else [html.Li("No tools found")])
+                    html.Li(display_name) for tool_name, display_name in self.tools_with_display_names
+                ] if self.tools_with_display_names else [html.Li("No tools found")])
             ], className="card")
         ])
     
@@ -316,6 +328,40 @@ class MasterDashboard:
                 ], className="stat-card")
             ]
         
+        elif tool_type == 'graspevaluator':
+            grasp_score = data.get('grasp_score', 0)
+            letter_grade = data.get('letter_grade', 'F')
+            metrics = data.get('metrics', {})
+            enhanced_recommendations = data.get('enhanced_recommendations', [])
+            basic_recommendations = data.get('recommendations', [])
+            recommendations = len(enhanced_recommendations) if enhanced_recommendations else len(basic_recommendations)
+            
+            # Count metrics by rating (use normalized_score for comparison)
+            excellent_count = sum(1 for metric, details in metrics.items() 
+                                if isinstance(details, dict) and details.get('normalized_score', 0) >= 90)
+            
+            return [
+                html.Div([
+                    html.Div(f"{grasp_score:.1f}", className="stat-number"),
+                    html.Div("GRASP Score", className="stat-label")
+                ], className="stat-card"),
+                
+                html.Div([
+                    html.Div(letter_grade, className="stat-number"),
+                    html.Div("Grade", className="stat-label")
+                ], className="stat-card"),
+                
+                html.Div([
+                    html.Div(str(excellent_count), className="stat-number"),
+                    html.Div("High-Scoring Metrics", className="stat-label")
+                ], className="stat-card"),
+                
+                html.Div([
+                    html.Div(str(recommendations), className="stat-number"),
+                    html.Div("Recommendations", className="stat-label")
+                ], className="stat-card")
+            ]
+        
         # Default stats for unknown tools
         return [
             html.Div([
@@ -335,6 +381,8 @@ class MasterDashboard:
             return self._generate_geoevaluator_content(data)
         elif tool_type == 'llmstxtgenerator':
             return self._generate_llmstxtgenerator_content(data)
+        elif tool_type == 'graspevaluator':
+            return self._generate_graspevaluator_content(data)
         
         # Default content for unknown tools
         return html.Div([
@@ -1242,6 +1290,378 @@ class MasterDashboard:
             sections.append(html.Div(sections_detail, className="card"))
         
         return html.Div(sections)
+    
+    def _generate_graspevaluator_content(self, data: Dict) -> html.Div:
+        """Generate content specific to GRASP evaluator results"""
+        
+        sections = []
+        
+        # Overall Score Display
+        grasp_score = data.get('grasp_score', 0)
+        letter_grade = data.get('letter_grade', 'F')
+        url = data.get('url', 'Unknown URL')
+        
+        # Score card with visual indicator
+        score_color = self._get_score_color(grasp_score)
+        
+        sections.append(html.Div([
+            html.H3("GRASP Content Quality Score"),
+            html.Div([
+                html.Div([
+                    html.Div(letter_grade, className="grade-letter", 
+                            style={'font-size': '4rem', 'font-weight': 'bold', 'color': score_color}),
+                    html.Div(f"{grasp_score:.1f} out of 100", className="score-number",
+                            style={'font-size': '1.5rem', 'color': score_color, 'margin-top': '0.5rem'}),
+                ], style={'text-align': 'center', 'padding': '2rem'}),
+                html.Div([
+                    html.Strong("Evaluated URL: "),
+                    html.A(url, href=url, target="_blank", 
+                          style={'color': 'var(--primary-orange)'})
+                ], style={'text-align': 'center', 'margin-top': '1rem'})
+            ])
+        ], className="card"))
+        
+        # Metrics Breakdown
+        metrics = data.get('metrics', {})
+        breakdown = data.get('breakdown', {})
+        
+        if metrics:
+            # Create metrics visualization
+            metric_names = []
+            metric_scores = []
+            metric_weights = []
+            metric_descriptions = []
+            
+            for metric_name, metric_data in metrics.items():
+                if isinstance(metric_data, dict):
+                    metric_names.append(metric_name.upper())
+                    score = metric_data.get('score', 0)
+                    weight = metric_data.get('weight', 0)
+                    description = metric_data.get('description', '')
+                    
+                    # Use normalized_score if available, otherwise calculate it
+                    if 'normalized_score' in metric_data:
+                        normalized_score = metric_data['normalized_score']
+                    else:
+                        # Fallback calculation for compatibility
+                        if metric_name == 'grounded':
+                            normalized_score = min(100, max(0, score * 10))
+                        elif metric_name == 'readable':
+                            if isinstance(score, bool):
+                                normalized_score = 100 if score else 0
+                            else:
+                                normalized_score = score
+                        elif metric_name == 'accurate':
+                            if isinstance(score, str):
+                                score_map = {'High': 100, 'Medium': 50, 'Low': 0}
+                                normalized_score = score_map.get(score, 0)
+                            else:
+                                normalized_score = score
+                        else:  # structured, polished
+                            if isinstance(score, str):
+                                rating_map = {'Excellent': 100, 'Very Good': 90, 'Good': 80, 'Fair': 60, 'Poor': 40, 'Very Poor': 20}
+                                normalized_score = rating_map.get(score, 0)
+                            else:
+                                normalized_score = score
+                    
+                    metric_scores.append(normalized_score)
+                    metric_weights.append(weight)
+                    metric_descriptions.append(description)
+            
+            if metric_names:
+                # Create bar chart for metrics
+                fig_metrics = go.Figure()
+                
+                # Add bars with colors based on score
+                colors = [self._get_score_color(score) for score in metric_scores]
+                
+                fig_metrics.add_trace(go.Bar(
+                    x=metric_names,
+                    y=metric_scores,
+                    text=[f"{score:.1f}/100<br>({weight}% weight)" for score, weight in zip(metric_scores, metric_weights)],
+                    textposition='auto',
+                    marker_color=colors,
+                    hovertemplate='<b>%{x}</b><br>Score: %{y:.1f}/100<br>Weight: %{customdata}%<extra></extra>',
+                    customdata=metric_weights
+                ))
+                
+                fig_metrics.update_layout(
+                    title="GRASP Metrics Breakdown",
+                    xaxis_title="Metrics",
+                    yaxis_title="Score (0-100)",
+                    yaxis_range=[0, 100],
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    font_color='var(--text-color)',
+                    showlegend=False
+                )
+                
+                sections.append(html.Div([
+                    html.H3("Metrics Breakdown"),
+                    dcc.Graph(figure=fig_metrics)
+                ], className="card"))
+        
+        # Detailed Metric Explanations
+        metric_explanations = {
+            'grounded': 'Measures how well content supports answering customer intents and questions',
+            'readable': 'Evaluates if content reading level matches target audience expectations',
+            'accurate': 'Assesses content freshness as a proxy for accuracy and relevance',
+            'structured': 'Analyzes HTML semantic structure for optimal LLM consumption',
+            'polished': 'Checks grammar, spelling, and overall language quality'
+        }
+        
+        if metrics:
+            metric_details = [html.H3("Metric Details")]
+            
+            for metric_name, metric_data in metrics.items():
+                if isinstance(metric_data, dict):
+                    score = metric_data.get('score', 0)
+                    description = metric_data.get('description', '')
+                    weight = metric_data.get('weight', 0)
+                    
+                    # Get display score and color
+                    normalized_score = metric_data.get('normalized_score', 0)
+                    
+                    if metric_name == 'grounded':
+                        display_score = f"{score:.1f}/10"
+                        score_color = self._get_score_color(normalized_score)
+                    elif metric_name == 'readable':
+                        if isinstance(score, bool):
+                            display_score = "Pass" if score else "Fail"
+                            score_color = '#28a745' if score else '#dc3545'
+                        else:
+                            display_score = f"{score:.1f}"
+                            score_color = self._get_score_color(normalized_score)
+                    else:  # accurate, structured, polished
+                        display_score = str(score)
+                        score_color = self._get_score_color(normalized_score)
+                    
+                    metric_details.append(html.Div([
+                        html.Div([
+                            html.H4([
+                                metric_name.upper(),
+                                html.Span(f" ({weight}% weight)", style={'font-size': '0.8em', 'color': 'var(--text-muted)'})
+                            ], style={'margin-bottom': '0.5rem'}),
+                            html.Div(display_score, style={
+                                'font-size': '1.5rem', 
+                                'font-weight': 'bold', 
+                                'color': score_color,
+                                'margin-bottom': '0.5rem'
+                            }),
+                            html.P(description, style={'color': 'var(--text-muted)'}),
+                            html.P(metric_explanations.get(metric_name, ''), style={'font-size': '0.9em'})
+                        ])
+                    ], className="metric-detail", style={
+                        'border-left': f'4px solid {score_color}',
+                        'padding-left': '1rem',
+                        'margin': '1rem 0'
+                    }))
+            
+            sections.append(html.Div(metric_details, className="card"))
+        
+        # Enhanced Recommendations
+        enhanced_recommendations = data.get('enhanced_recommendations', [])
+        basic_recommendations = data.get('recommendations', [])
+        
+        if enhanced_recommendations:
+            rec_sections = []
+            
+            # Group recommendations by priority
+            priority_groups = {
+                'critical': {'items': [], 'color': '#DC2626', 'label': 'Critical Issues'},
+                'high': {'items': [], 'color': '#EA580C', 'label': 'High Priority'},
+                'medium': {'items': [], 'color': '#F59E0B', 'label': 'Medium Priority'},
+                'low': {'items': [], 'color': '#10B981', 'label': 'Low Priority'}
+            }
+            
+            for rec in enhanced_recommendations:
+                priority = rec.get('priority', 'medium')
+                if priority in priority_groups:
+                    priority_groups[priority]['items'].append(rec)
+            
+            # Create sections for each priority level
+            for priority, group in priority_groups.items():
+                if not group['items']:
+                    continue
+                    
+                priority_items = []
+                for rec in group['items']:
+                    # Build recommendation card
+                    rec_card = html.Div([
+                        # Header with issue and category
+                        html.Div([
+                            html.Span(rec.get('category', 'General').replace('_', ' ').title(), 
+                                    className="badge",
+                                    style={'background': group['color'], 'color': 'white', 'margin-right': '0.5rem'}),
+                            html.Strong(rec.get('issue', 'No issue description'))
+                        ], style={'margin-bottom': '0.5rem'}),
+                        
+                        # Impact
+                        html.Div([
+                            html.Strong("Impact: "),
+                            rec.get('impact', 'No impact description')
+                        ], className="text-muted", style={'margin-bottom': '0.5rem'}),
+                        
+                        # Action
+                        html.Div([
+                            html.Strong("Action: "),
+                            rec.get('action', 'No action specified')
+                        ], style={'margin-bottom': '1rem'}),
+                        
+                        # Implementation details (if available)
+                        self._render_implementation_details(rec.get('implementation', {})),
+                        
+                        # Specifics (if available)
+                        self._render_specifics(rec.get('specifics', {}))
+                        
+                    ], className="recommendation-card", style={
+                        'border-left': f'4px solid {group["color"]}',
+                        'padding': '1rem',
+                        'margin-bottom': '1rem',
+                        'background': 'var(--gray-50)',
+                        'border-radius': '0.5rem'
+                    })
+                    
+                    priority_items.append(rec_card)
+                
+                # Add priority section
+                rec_sections.append(html.Div([
+                    html.H4([
+                        html.Span(group['label'], style={'color': group['color']}),
+                        html.Span(f" ({len(group['items'])})", style={'color': '#6B7280'})
+                    ], style={'margin-bottom': '1rem'}),
+                    html.Div(priority_items)
+                ]))
+            
+            sections.append(html.Div([
+                html.H3("Detailed Improvement Recommendations"),
+                html.Div(rec_sections)
+            ], className="card"))
+            
+        elif basic_recommendations:
+            # Fallback to basic recommendations if enhanced ones aren't available
+            rec_items = []
+            for i, rec in enumerate(basic_recommendations, 1):
+                rec_items.append(html.Li([
+                    html.Strong(f"{i}. "),
+                    rec
+                ], style={'margin': '0.5rem 0'}))
+            
+            sections.append(html.Div([
+                html.H3("Improvement Recommendations"),
+                html.Ul(rec_items, style={'padding-left': '1rem'})
+            ], className="card"))
+        
+        return html.Div(sections)
+    
+    def _render_implementation_details(self, implementation: Dict) -> html.Div:
+        """Render implementation details for enhanced recommendations"""
+        if not implementation:
+            return html.Div()
+        
+        details = []
+        
+        # Effort and timeline
+        if implementation.get('effort') or implementation.get('timeline'):
+            effort_timeline = []
+            if implementation.get('effort'):
+                effort_timeline.append(html.Span([
+                    html.Strong("Effort: "),
+                    implementation['effort'].title()
+                ], style={'margin-right': '1rem'}))
+            
+            if implementation.get('timeline'):
+                effort_timeline.append(html.Span([
+                    html.Strong("Timeline: "),
+                    implementation['timeline']
+                ]))
+            
+            details.append(html.Div(effort_timeline, style={'margin-bottom': '0.5rem', 'font-size': '0.9rem'}))
+        
+        # Steps
+        if implementation.get('steps'):
+            steps_list = []
+            for i, step in enumerate(implementation['steps'], 1):
+                steps_list.append(html.Li(step, style={'margin': '0.25rem 0'}))
+            
+            details.append(html.Div([
+                html.Strong("Implementation Steps:"),
+                html.Ol(steps_list, style={'margin': '0.5rem 0', 'padding-left': '1.5rem'})
+            ], style={'margin-bottom': '0.5rem'}))
+        
+        # Other implementation fields
+        for key, value in implementation.items():
+            if key in ['effort', 'timeline', 'steps']:
+                continue
+            
+            if isinstance(value, list) and value:
+                details.append(html.Div([
+                    html.Strong(f"{key.replace('_', ' ').title()}: "),
+                    html.Ul([html.Li(item) for item in value], style={'margin': '0.25rem 0', 'padding-left': '1.5rem'})
+                ], style={'margin-bottom': '0.5rem', 'font-size': '0.9rem'}))
+            elif isinstance(value, str):
+                details.append(html.Div([
+                    html.Strong(f"{key.replace('_', ' ').title()}: "),
+                    value
+                ], style={'margin-bottom': '0.25rem', 'font-size': '0.9rem'}))
+        
+        if details:
+            return html.Div([
+                html.Div("Implementation Details", style={'font-weight': 'bold', 'margin-bottom': '0.5rem'}),
+                html.Div(details, className="implementation-details", style={
+                    'background': 'white',
+                    'padding': '0.75rem',
+                    'border-radius': '0.25rem',
+                    'border': '1px solid #E5E7EB'
+                })
+            ], style={'margin-bottom': '1rem'})
+        
+        return html.Div()
+    
+    def _render_specifics(self, specifics: Dict) -> html.Div:
+        """Render specifics section for enhanced recommendations"""
+        if not specifics:
+            return html.Div()
+        
+        details = []
+        
+        for key, value in specifics.items():
+            if isinstance(value, list) and value:
+                details.append(html.Div([
+                    html.Strong(f"{key.replace('_', ' ').title()}: "),
+                    html.Ul([html.Li(str(item)) for item in value], style={'margin': '0.25rem 0', 'padding-left': '1.5rem'})
+                ], style={'margin-bottom': '0.5rem'}))
+            elif isinstance(value, (str, int, float)):
+                details.append(html.Div([
+                    html.Strong(f"{key.replace('_', ' ').title()}: "),
+                    str(value)
+                ], style={'margin-bottom': '0.25rem'}))
+        
+        if details:
+            return html.Div([
+                html.Div("Specifics", style={'font-weight': 'bold', 'margin-bottom': '0.5rem'}),
+                html.Div(details, className="specifics-box", style={
+                    'background': '#F9FAFB',
+                    'padding': '0.75rem',
+                    'border-radius': '0.25rem',
+                    'font-size': '0.9rem'
+                })
+            ], style={'margin-bottom': '1rem'})
+        
+        return html.Div()
+    
+    def _get_score_color(self, score: float) -> str:
+        """Get color based on score"""
+        if score >= 90:
+            return '#28a745'  # Green
+        elif score >= 80:
+            return '#20c997'  # Teal
+        elif score >= 70:
+            return '#ffc107'  # Yellow
+        elif score >= 60:
+            return '#fd7e14'  # Orange
+        else:
+            return '#dc3545'  # Red
     
     def run(self, debug: bool = True, port: int = 8050, host: str = '127.0.0.1'):
         self.logger.info(f"Starting master dashboard on http://{host}:{port}")

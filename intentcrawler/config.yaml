@@ -1,3 +1,6 @@
+# Display name for the dashboard dropdown
+display_name: "Intent Crawler"
+
 crawler:
   max_pages: 1000
   rate_limit: 2

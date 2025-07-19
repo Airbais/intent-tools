@@ -854,3 +854,90 @@ table a:hover {
     color: #F5F5F4 !important;
   }
 }
+
+/* Enhanced Recommendations Dark Mode Fixes */
+[data-theme="dark"] .recommendation-card {
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .recommendation-card h4,
+[data-theme="dark"] .recommendation-card h5,
+[data-theme="dark"] .recommendation-card h6 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .recommendation-card p,
+[data-theme="dark"] .recommendation-card span,
+[data-theme="dark"] .recommendation-card div,
+[data-theme="dark"] .recommendation-card li {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .recommendation-card strong {
+  color: var(--text-primary) !important;
+}
+
+/* Badge styles for dark mode */
+[data-theme="dark"] .badge {
+  color: white !important;
+}
+
+/* Implementation details box in dark mode */
+[data-theme="dark"] .implementation-details {
+  background: var(--bg-hover) !important;
+  border-color: var(--gray-300) !important;
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .implementation-details h5,
+[data-theme="dark"] .implementation-details strong {
+  color: var(--text-primary) !important;
+}
+
+/* Specifics box in dark mode */
+[data-theme="dark"] .specifics-box {
+  background: var(--bg-hover) !important;
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .specifics-box h5,
+[data-theme="dark"] .specifics-box strong {
+  color: var(--text-primary) !important;
+}
+
+/* Auto dark mode support for recommendations */
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .recommendation-card {
+    background: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+  }
+
+  html:not([data-theme="light"]) .recommendation-card h4,
+  html:not([data-theme="light"]) .recommendation-card h5,
+  html:not([data-theme="light"]) .recommendation-card h6 {
+    color: var(--text-primary) !important;
+  }
+
+  html:not([data-theme="light"]) .recommendation-card p,
+  html:not([data-theme="light"]) .recommendation-card span,
+  html:not([data-theme="light"]) .recommendation-card div,
+  html:not([data-theme="light"]) .recommendation-card li {
+    color: var(--text-secondary) !important;
+  }
+
+  html:not([data-theme="light"]) .recommendation-card strong {
+    color: var(--text-primary) !important;
+  }
+
+  html:not([data-theme="light"]) .implementation-details {
+    background: var(--bg-hover) !important;
+    border-color: var(--gray-300) !important;
+    color: var(--text-secondary) !important;
+  }
+
+  html:not([data-theme="light"]) .specifics-box {
+    background: var(--bg-hover) !important;
+    color: var(--text-secondary) !important;
+  }
+}

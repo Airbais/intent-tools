@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="1200"
+   height="1200"
+   viewBox="0 0 317.49998 317.50001"
+   version="1.1"
+   id="svg864"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="airbais_logo_color-1200x1200.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview866"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     inkscape:document-units="mm"
+     showgrid="false"
+     units="px"
+     inkscape:zoom="0.40588894"
+     inkscape:cx="-3.6955922"
+     inkscape:cy="500.13682"
+     inkscape:window-width="1897"
+     inkscape:window-height="1287"
+     inkscape:window-x="1834"
+     inkscape:window-y="217"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="g137399" />
+  <defs
+     id="defs861" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g137399"
+       transform="matrix(0.99479932,0,0,0.99479932,58.298572,-0.07723695)">
+      <g
+         id="g112914-3"
+         transform="matrix(0.31915985,0,0,0.31915985,-90.446331,-31.306417)"
+         style="fill:#f78d1f;fill-opacity:1"
+         inkscape:export-filename="/home/bill/Pardicloud/Projects/Newco/airbais-logo-color-1200.png"
+         inkscape:export-xdpi="96"
+         inkscape:export-ydpi="96">
+        <path
+           d="m 750,250 c 0,-82.699 -67.301,-150 -150,-150 -82.699,0 -150,67.301 -150,150 0,82.699 67.301,150 150,150 82.699,0 150,-67.301 150,-150 z m -150,50 c -27.602,0 -50,-22.398 -50,-50 0,-27.602 22.398,-50 50,-50 27.551,0 50,22.449 50,50 0,27.551 -22.398,50 -50,50 z"
+           id="path112893-18"
+           style="fill:#f78d1f;fill-opacity:1" />
+        <path
+           d="m 950,800 c -82.699,0 -150,67.301 -150,150 0,82.699 67.301,150 150,150 82.699,0 150,-67.301 150,-150 0,-82.699 -67.301,-150 -150,-150 z m 0,200 c -27.602,0 -50,-22.449 -50,-50 0,-27.551 22.398,-50 50,-50 27.602,0 50,22.449 50,50 0,27.551 -22.398,50 -50,50 z"
+           id="path112895-7"
+           style="fill:#f78d1f;fill-opacity:1" />
+        <path
+           d="m 250,800 c -82.699,0 -150,67.301 -150,150 0,82.699 67.352,150 150.05,150 C 332.698,1100 400,1032.699 400,950 400,867.301 332.699,800 250,800 Z m 0.0508,200 c -27.652,0 -50.051,-22.449 -50.051,-50 0,-27.551 22.398,-50 50,-50 27.602,0 50,22.449 50,50 0,27.551 -22.398,50 -49.949,50 z"
+           id="path112897-4"
+           style="fill:#f78d1f;fill-opacity:1" />
+        <path
+           d="M 950,600 C 950,517.301 882.648,450 799.95,450 717.302,450 650,517.301 650,600 c 0,82.699 67.301,150 150,150 82.699,0 150,-67.301 150,-150 z m -200,0 c 0,-13.352 5.1992,-25.898 14.648,-35.352 9.4531,-9.4492 22,-14.648 35.352,-14.648 27.602,0 50,22.449 50,50 0,27.551 -22.398,50 -50,50 -27.602,0 -50,-22.449 -50,-50 z"
+           id="path112899-16"
+           style="fill:#f78d1f;fill-opacity:1" />
+        <path
+           d="m 400,450 c -82.699,0 -150,67.301 -150,150 0,82.699 67.301,150 150,150 82.699,0 150,-67.301 150,-150 0,-82.699 -67.301,-150 -150,-150 z m 0,200 c -27.602,0 -50,-22.449 -50,-50 0,-27.551 22.449,-50 50,-50 27.602,0 50,22.449 50,50 0,27.551 -22.398,50 -50,50 z"
+           id="path112901-3"
+           style="fill:#f78d1f;fill-opacity:1" />
+      </g>
+    </g>
+  </g>
+</svg>

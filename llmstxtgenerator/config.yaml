@@ -1,5 +1,8 @@
 # LLMS.txt Generator Configuration
 
+# Display name for the dashboard dropdown
+display_name: "LLMS.txt Generator"
+
 website:
   url: "https://yoursite.com"
   # Name of the site/project (if not auto-detected)

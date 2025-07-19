@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 from datetime import datetime
 import glob
+import yaml
 
 class ToolDataLoader:
     def __init__(self, tools_root_path: str = None):
@@ -23,6 +24,31 @@ class ToolDataLoader:
             self.tools_root = Path(__file__).parent.parent
         
         self.logger.info(f"Tools root path: {self.tools_root}")
+    
+    def get_tool_display_name(self, tool_name: str) -> str:
+        """Get the display name for a tool from its config file, with fallback to formatted tool name"""
+        try:
+            # Check for config.yaml in tool root
+            config_path = self.tools_root / tool_name / 'config.yaml'
+            if config_path.exists():
+                with open(config_path, 'r', encoding='utf-8') as f:
+                    config = yaml.safe_load(f)
+                    if config and 'display_name' in config:
+                        return config['display_name']
+            
+            # Check for config.yaml in config subdirectory (e.g., graspevaluator)
+            config_subdir_path = self.tools_root / tool_name / 'config'
+            if config_subdir_path.exists():
+                for config_file in config_subdir_path.glob('*config*.yaml'):
+                    with open(config_file, 'r', encoding='utf-8') as f:
+                        config = yaml.safe_load(f)
+                        if config and 'display_name' in config:
+                            return config['display_name']
+        except Exception as e:
+            self.logger.debug(f"Could not read config for {tool_name}: {e}")
+        
+        # Fallback to current formatting logic
+        return tool_name.title().replace('_', ' ')
     
     def discover_tools(self) -> List[str]:
         """Discover all available tools by scanning for directories with results folders"""
@@ -40,6 +66,11 @@ class ToolDataLoader:
             self.logger.error(f"Error discovering tools: {e}")
         
         return sorted(tools)
+    
+    def get_tools_with_display_names(self) -> List[Tuple[str, str]]:
+        """Get all tools with their display names as (tool_name, display_name) tuples"""
+        tools = self.discover_tools()
+        return [(tool, self.get_tool_display_name(tool)) for tool in tools]
     
     def get_tool_runs(self, tool_name: str) -> List[Tuple[str, datetime]]:
         """Get all available runs for a specific tool, sorted by date"""
@@ -90,12 +121,15 @@ class ToolDataLoader:
             with open(data_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
             
+            # Detect tool type first
+            tool_type = self._detect_tool_type(data)
+            
             # Add metadata about the tool and run
             data['_metadata'] = {
                 'tool_name': tool_name,
                 'run_date': run_date,
                 'data_file': str(data_file),
-                'tool_type': self._detect_tool_type(data)
+                'tool_type': tool_type
             }
             
             # Standardize the data format
@@ -131,6 +165,15 @@ class ToolDataLoader:
             if metadata.get('tool_name') == 'llmstxtgenerator':
                 return 'llmstxtgenerator'
         
+        # GRASP Evaluator detection
+        if 'tool' in data and data.get('tool') == 'graspevaluator':
+            return 'graspevaluator'
+        if 'overall_score' in data and 'metrics' in data and 'breakdown' in data and 'recommendations' in data:
+            # Check if it has GRASP-specific metrics
+            metrics = data.get('metrics', {})
+            if 'grounded' in metrics and 'readable' in metrics and 'accurate' in metrics:
+                return 'graspevaluator'
+        
         # Future tool types can be detected here
         # Example:
         # if 'sentiment_analysis' in data:
@@ -153,6 +196,8 @@ class ToolDataLoader:
             return self._standardize_geoevaluator_data(data)
         elif tool_type == 'llmstxtgenerator':
             return self._standardize_llmstxtgenerator_data(data)
+        elif tool_type == 'graspevaluator':
+            return self._standardize_graspevaluator_data(data)
         
         # Future tool standardization can be added here
         # elif tool_type == 'sentimentanalyzer':
@@ -369,10 +414,57 @@ class ToolDataLoader:
                 'success_rate': round(generation_summary.get('success_rate', 0), 1)
             }
         
+        elif tool_type == 'graspevaluator':
+            aggregate = data.get('aggregate', {})
+            return {
+                'grasp_score': aggregate.get('average_grasp_score', 0),
+                'pages_evaluated': aggregate.get('total_pages', 0),
+                'grade_distribution': aggregate.get('grade_distribution', {}),
+                'total_words': aggregate.get('total_word_count', 0)
+            }
+        
         # Default stats for unknown tools
         return {
             'data_size': len(str(data))
         }
+    
+    def _standardize_graspevaluator_data(self, data: Dict) -> Dict:
+        """Standardize GRASP evaluator data format"""
+        
+        # Calculate letter grade from overall score
+        overall_score = data.get('overall_score', 0)
+        if overall_score >= 90:
+            letter_grade = 'A'
+        elif overall_score >= 80:
+            letter_grade = 'B'
+        elif overall_score >= 70:
+            letter_grade = 'C'
+        elif overall_score >= 60:
+            letter_grade = 'D'
+        else:
+            letter_grade = 'F'
+        
+        standardized = {
+            'grasp_score': data.get('overall_score', 0),
+            'letter_grade': letter_grade,
+            'metrics': data.get('metrics', {}),
+            'breakdown': data.get('breakdown', {}),
+            'recommendations': data.get('recommendations', []),
+            'url': data.get('url', ''),
+            'timestamp': data.get('timestamp', ''),
+            '_metadata': {
+                'tool_type': 'graspevaluator',
+                'tool_name': 'GRASP Content Quality Evaluator',
+                'version': '1.0.0'
+            }
+        }
+        
+        # Copy any additional fields
+        for key, value in data.items():
+            if key not in standardized:
+                standardized[key] = value
+        
+        return standardized
 
 # Convenience function for easy imports
 def load_tool_data(tool_name: str, run_date: str = None, tools_root: str = None) -> Optional[Dict]:
