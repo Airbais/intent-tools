@@ -72,6 +72,26 @@ GEO Evaluator helps you understand:
 
 [Learn more about GEO Evaluator →](./geoevaluator/)
 
+### GRASP Evaluator
+
+GRASP Evaluator provides comprehensive content quality assessment using five key dimensions that matter for both user experience and AI comprehension. GRASP stands for Grounded, Readable, Accurate, Structured, and Polished - the essential qualities that make content effective for modern AI-driven discovery.
+
+**Key Features:**
+- **Multi-Dimensional Analysis**: Evaluates content across five critical quality metrics with weighted scoring
+- **AI-Powered Intent Alignment**: Uses advanced LLM analysis to measure how well content addresses customer intents
+- **Readability Assessment**: Ensures content matches your target audience's reading level using multiple algorithms
+- **Structure Analysis**: Evaluates HTML semantic structure, schema markup, and heading hierarchy for optimal LLM understanding
+- **Actionable Recommendations**: Provides detailed, prioritized improvement suggestions with implementation timelines
+
+GRASP Evaluator helps you answer:
+- How well does my content align with customer intents and questions?
+- Is my content readable and accessible to my target audience?
+- How fresh and accurate is my content from an AI perspective?
+- Is my HTML structure optimized for LLM comprehension?
+- What specific steps can I take to improve my content quality score?
+
+[Learn more about GRASP Evaluator →](./graspevaluator/)
+
 ### LLMS.txt Generator
 
 LLMS.txt Generator creates standardized LLMS.txt files that help Large Language Models better understand and reference your website content. Following the llmstxt.org specification, this tool automatically crawls any website and generates structured summaries optimized for AI comprehension.
