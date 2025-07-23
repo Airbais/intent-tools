@@ -1,0 +1,99 @@
+# Airbais Tools Configuration
+# This file defines all available tools and their settings for the automation API
+
+tools:
+  intentcrawler:
+    name: "IntentCrawler"
+    module_path: "intentcrawler"
+    script: "intentcrawler.py"
+    description: "Website intent analysis tool that discovers user intents for LLMs"
+    result_files:
+      - "dashboard-data.json"
+      - "intent-report.json"
+      - "intent-summary.md"
+      - "llm-export.json"
+    required_params:
+      - "url"
+    optional_params:
+      - "config"
+      - "output"
+      - "log_level"
+    param_style: "positional"  # URL is positional argument
+    
+  graspevaluator:
+    name: "GRASP Evaluator"
+    module_path: "graspevaluator"
+    script: "graspevaluator.py"
+    description: "Content quality assessment tool using GRASP methodology (Grounded, Readable, Accurate, Structured, Polished)"
+    result_files:
+      - "dashboard-data.json"
+      - "grasp_evaluation_results.json"
+    required_params:
+      - "url"
+    optional_params:
+      - "config"
+      - "output"
+      - "verbose"
+    param_style: "flags"  # URL uses --url flag
+  
+  llmevaluator:
+    name: "LLM Evaluator"
+    module_path: "llmevaluator"
+    script: "llmevaluator.py"
+    description: "Evaluate brand presence and sentiment in LLM responses across multiple models"
+    result_files:
+      - "dashboard-data.json"
+      - "evaluation_report.txt"
+      - "metrics_summary.json"
+      - "raw_results.json"
+    required_params:
+      - "config"
+    optional_params:
+      - "output_dir"
+      - "no_cache"
+      - "clear_cache"
+      - "log_level"
+      - "dry_run"
+      - "dashboard"
+    param_style: "config_file"  # Special handling for config file parameter
+  
+  geoevaluator:
+    name: "GEO Evaluator"
+    module_path: "geoevaluator"
+    script: "geoevaluator.py"
+    description: "Generative Engine Optimization tool that analyzes websites for LLM understanding and optimization"
+    result_files:
+      - "dashboard-data.json"
+      - "detailed_scores.json"
+      - "geo_analysis_report.html"
+    required_params:
+      - "url"
+    optional_params:
+      - "name"
+      - "max_pages"
+      - "crawl_depth"
+      - "output_dir"
+      - "dashboard"
+      - "formats"
+      - "delay"
+      - "timeout"
+      - "verbose"
+    param_style: "flags"  # All parameters use flags
+
+# API Server Configuration
+server:
+  port: 8888
+  host: "0.0.0.0"
+  debug: false
+  cors_enabled: true
+  max_jobs_in_memory: 1000
+  job_cleanup_after_hours: 24
+
+# Default timeouts (in seconds)
+timeouts:
+  default: 600  # 10 minutes
+  intentcrawler: 900  # 15 minutes for larger sites
+  graspevaluator: 600  # 10 minutes for GRASP evaluation
+  geoevaluator: 900  # 15 minutes for comprehensive GEO analysis
+  llmevaluator: 1200  # 20 minutes for multi-LLM evaluation
+  llmstxt_generator: 300

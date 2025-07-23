@@ -1,0 +1,476 @@
+{
+  "name": "Airbais-GRASP-Evaluator",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        -16
+      ],
+      "id": "bb7c5802-e41f-4508-8f46-fc09628608a6",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "http://127.0.0.1:8888/health",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -208,
+        -16
+      ],
+      "id": "0feaae40-946e-43fc-a612-f95c7e720152",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1250ba75-255e-4c6a-8ea1-f60ea2958857",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "healthy",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        -16
+      ],
+      "id": "34d39440-4046-4f4d-85ac-35c54e451ac5",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "id": "1769db15-4d05-40b4-9cb3-a536181b433b",
+      "name": "Server unhealthy",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        0,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        464,
+        -32
+      ],
+      "id": "cb96a748-dd25-42f0-8a69-76836983742a",
+      "name": "Wait",
+      "webhookId": "43df9f61-1ae9-419d-8c24-05c28e22032a"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8888/graspevaluator/analyze",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "https://airbais.com"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        256,
+        -32
+      ],
+      "id": "f0f7f638-b88d-43a4-bfdc-f71b473298ec",
+      "name": "Start Analysis"
+    },
+    {
+      "parameters": {
+        "url": "=http://127.0.0.1:8888/status/{{$json.body.job_id}}`",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        656,
+        -32
+      ],
+      "id": "217578fc-c4b5-4939-940c-433aa6d358bb",
+      "name": "Check Status"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1250ba75-255e-4c6a-8ea1-f60ea2958857",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        816,
+        -32
+      ],
+      "id": "f7f214a6-d44f-44ad-8cb9-b21bda389538",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Convert binary to text\nconst binaryData = $input.first().binary.data;\nconst textContent = Buffer.from(binaryData.data, 'base64').toString('utf-8');\n\nreturn {\n  json: {\n    content: textContent,\n    fileName: $input.first().json.fileName,\n    mimeType: $input.first().json.mimeType\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        432
+      ],
+      "id": "d12f62f9-b122-411c-9a20-85cc78c5aa89",
+      "name": "Read content"
+    },
+    {
+      "parameters": {
+        "fileSelector": "={{ $json.results.files.dashboard_data }}",
+        "options": {}
+      },
+      "id": "ca0c9df9-e9da-46cf-8b76-3cbd48239a8b",
+      "name": "Read File Content",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        576,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert at content analysis. You will examine the data provided and think about what insights can be drawn from it. I want to know:\n1. What are we doing well and what needs work?\n2. Offer any insights on what we might improve or change to better improve our presence in LLMs.\n\nThe data you will examine is:  {{ $json.content }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        1072,
+        432
+      ],
+      "id": "60f7e5d7-16bc-4a34-9f3c-97bf033d726d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514",
+          "cachedResultName": "Claude 4 Sonnet"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        1072,
+        640
+      ],
+      "id": "6e05da6b-0d28-4af1-a574-64259b88b27a",
+      "name": "Anthropic Chat Model1",
+      "credentials": {
+        "anthropicApi": {
+          "id": "y50xHAetY4ayBF6t",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "### Health check \nEnsures the server is running!",
+        "height": 256,
+        "width": 192
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -256,
+        -112
+      ],
+      "typeVersion": 1,
+      "id": "8b7689a9-2246-4daa-903d-384426498549",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "### AI Summary \nOptional step to have AI read the report and provide a summary and recommendations. Modify the prompt to suit any purpose you have!",
+        "height": 496,
+        "width": 320,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1040,
+        304
+      ],
+      "typeVersion": 1,
+      "id": "35d15de4-6414-4233-acbf-cfb1256af60f",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "### Checks that results are available and reads the report\nDefaults to read the dashboard data but can be modified to read other reports as well.",
+        "height": 288,
+        "width": 672,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        272,
+        288
+      ],
+      "typeVersion": 1,
+      "id": "b1078ae9-a814-43e7-97d8-9cda1acfad0c",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "url": "=http://127.0.0.1:8888/results/{{$json.job_id}}`",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        336,
+        432
+      ],
+      "id": "54b48363-323d-4199-af95-8783b684d1d2",
+      "name": "Check for results"
+    },
+    {
+      "parameters": {
+        "content": "### Runs the tool and checks for completion\nWill wait 30 sec to check for completion status. Loops again if not complete. The wait time is easliy modified.",
+        "height": 272,
+        "width": 784,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        192,
+        -128
+      ],
+      "typeVersion": 1,
+      "id": "ea2f6f9b-5b77-443d-af84-84559339ae7f",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "# Airbais GRASP Evaluator",
+        "height": 80,
+        "width": 432,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -416,
+        -288
+      ],
+      "typeVersion": 1,
+      "id": "52b4ef66-acd2-49e7-a8e2-556319078032",
+      "name": "Sticky Note4"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Start Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Server unhealthy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Check Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Analysis": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Status": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Check for results",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read File Content": {
+      "main": [
+        [
+          {
+            "node": "Read content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read content": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check for results": {
+      "main": [
+        [
+          {
+            "node": "Read File Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f879e61d-7b18-4263-961d-630f6d7dfce3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b667caaf26d1d42eea7d88af9875dda2df849802c97a94bd2bc11daafe7f8a41"
+  },
+  "id": "CRlky9GI7UBeW8Qi",
+  "tags": []
+}
