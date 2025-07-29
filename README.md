@@ -1,6 +1,6 @@
 # Airbais Tools
 
-Welcome to Airbais, a company dedicated to helping businesses improve their presence and visibility in Large Language Models (LLMs) and AI agents. As AI becomes increasingly integrated into how people search for information and make decisions, it's crucial for businesses to understand and optimize how they appear in these systems.
+Welcome to Airbais, dedicated to helping businesses improve their presence and visibility in Large Language Models (LLMs) and AI agents. As AI becomes increasingly integrated into how people search for information and make decisions, it's crucial for businesses to understand and optimize how they appear in these systems.
 
 ## Our Mission
 
