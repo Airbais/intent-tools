@@ -70,7 +70,7 @@ class MasterDashboard:
             html.Div([
                 html.Div([
                     html.H3("Tool Selection", className="section-title"),
-                    html.P("Select a tool and run to analyze", className="text-muted")
+                    # html.P("Select a tool and run to analyze", className="text-muted")
                 ], className="section-header"),
                 html.Div([
                     html.Div([
