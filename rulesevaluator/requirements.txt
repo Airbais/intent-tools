@@ -1,0 +1,46 @@
+# Core Dependencies
+pyyaml>=6.0.1
+python-dotenv>=1.0.0
+requests>=2.31.0
+tenacity>=8.2.0
+colorlog>=6.7.0
+tqdm>=4.65.0
+
+# AI Providers
+openai>=1.12.0
+anthropic>=0.18.0
+
+# RAG & Vector Database
+chromadb>=0.4.22
+langchain>=0.1.0
+langchain-community>=0.0.10
+
+# Document Processing
+beautifulsoup4>=4.12.0
+markdown2>=2.4.0
+python-docx>=1.1.0
+pandas>=2.0.0
+PyPDF2>=3.0.0
+
+# Cloud Storage
+google-api-python-client>=2.100.0
+google-auth>=2.23.0
+google-auth-oauthlib>=1.1.0
+google-auth-httplib2>=0.1.1
+dropbox>=11.36.2
+msal>=1.24.0
+msgraph-core>=0.2.2
+
+# Web Scraping
+httpx>=0.25.0
+lxml>=4.9.0
+
+# Development & Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+black>=23.0.0
+flake8>=6.0.0
+
+# Data Processing
+numpy>=1.24.0
+diskcache>=5.6.0

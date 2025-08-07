@@ -174,6 +174,17 @@ class ToolDataLoader:
             if 'grounded' in metrics and 'readable' in metrics and 'accurate' in metrics:
                 return 'graspevaluator'
         
+        # Rules Evaluator detection
+        if 'tool' in data and data.get('tool') == 'rulesevaluator':
+            return 'rulesevaluator'
+        if 'summary' in data and 'metrics' in data:
+            # Check for Rules Evaluator specific structure
+            summary = data.get('summary', {})
+            metrics = data.get('metrics', {})
+            if ('total_prompts' in summary and 'overall_pass_rate' in summary and 
+                'pass_rates_by_type' in metrics and 'database_stats' in metrics):
+                return 'rulesevaluator'
+        
         # Future tool types can be detected here
         # Example:
         # if 'sentiment_analysis' in data:

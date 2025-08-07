@@ -80,6 +80,28 @@ tools:
       - "verbose"
     param_style: "flags"  # All parameters use flags
 
+  rulesevaluator:
+    name: "Rules Evaluator"
+    module_path: "rulesevaluator"
+    script: "rulesevaluator.py"
+    description: "Evaluate AI responses against user-defined rules using RAG technology"
+    result_files:
+      - "dashboard-data.json"
+      - "evaluation_results.json"
+      - "evaluation_summary.md"
+      - "evaluation_report.html"
+      - "ai_responses.log"
+    required_params:
+      - "rules_file"
+    optional_params:
+      - "config" 
+      - "content_source"
+      - "output"
+      - "log_level"
+      - "no_cache"
+      - "dry_run"
+    param_style: "positional"  # Rules file is positional argument
+
 # API Server Configuration
 server:
   port: 8888
@@ -97,3 +119,4 @@ timeouts:
   geoevaluator: 900  # 15 minutes for comprehensive GEO analysis
   llmevaluator: 1200  # 20 minutes for multi-LLM evaluation
   llmstxt_generator: 300
+  rulesevaluator: 900  # 15 minutes for RAG database and evaluation

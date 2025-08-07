@@ -362,6 +362,40 @@ class MasterDashboard:
                 ], className="stat-card")
             ]
         
+        elif tool_type == 'rulesevaluator':
+            summary = data.get('summary', {})
+            total_prompts = summary.get('total_prompts', 0)
+            prompts_passed = summary.get('prompts_passed', 0)
+            overall_pass_rate = summary.get('overall_pass_rate', 0)
+            average_score = summary.get('average_score', 0)
+            critical_failures = summary.get('critical_failures', 0)
+            
+            # Get database stats
+            db_stats = data.get('metrics', {}).get('database_stats', {})
+            total_chunks = db_stats.get('total_chunks', 0)
+            
+            return [
+                html.Div([
+                    html.Div(str(total_prompts), className="stat-number"),
+                    html.Div("Prompts Evaluated", className="stat-label")
+                ], className="stat-card"),
+                
+                html.Div([
+                    html.Div(f"{overall_pass_rate:.1f}%", className="stat-number"),
+                    html.Div("Pass Rate", className="stat-label")
+                ], className="stat-card"),
+                
+                html.Div([
+                    html.Div(f"{average_score:.1f}", className="stat-number"),
+                    html.Div("Average Score", className="stat-label")
+                ], className="stat-card"),
+                
+                html.Div([
+                    html.Div(str(total_chunks), className="stat-number"),
+                    html.Div("Knowledge Chunks", className="stat-label")
+                ], className="stat-card")
+            ]
+        
         # Default stats for unknown tools
         return [
             html.Div([
@@ -383,6 +417,8 @@ class MasterDashboard:
             return self._generate_llmstxtgenerator_content(data)
         elif tool_type == 'graspevaluator':
             return self._generate_graspevaluator_content(data)
+        elif tool_type == 'rulesevaluator':
+            return self._generate_rulesevaluator_content(data)
         
         # Default content for unknown tools
         return html.Div([
@@ -1649,6 +1685,296 @@ class MasterDashboard:
             ], style={'margin-bottom': '1rem'})
         
         return html.Div()
+    
+    def _generate_rulesevaluator_content(self, data: Dict) -> html.Div:
+        """Generate content specific to Rules Evaluator results"""
+        
+        sections = []
+        
+        # Evaluation Summary
+        summary = data.get('summary', {})
+        metadata = data.get('_metadata', {})
+        
+        total_prompts = summary.get('total_prompts', 0)
+        prompts_passed = summary.get('prompts_passed', 0)
+        overall_pass_rate = summary.get('overall_pass_rate', 0)
+        average_score = summary.get('average_score', 0)
+        critical_failures = summary.get('critical_failures', 0)
+        evaluation_passed = summary.get('evaluation_passed', False)
+        
+        # Status color based on pass rate
+        status_color = '#28A745' if evaluation_passed else '#DC2626'
+        status_text = "✅ PASSED" if evaluation_passed else "❌ FAILED"
+        
+        # Evaluation Summary Card
+        summary_content = [
+            html.H3("Rules Evaluation Summary"),
+            html.Div([
+                html.Div([
+                    html.Div(status_text, style={
+                        'font-size': '1.5rem',
+                        'font-weight': 'bold',
+                        'color': status_color,
+                        'text-align': 'center',
+                        'margin-bottom': '1rem'
+                    }),
+                    html.Div(f"{overall_pass_rate:.1f}% Pass Rate", style={
+                        'font-size': '1.2rem',
+                        'text-align': 'center',
+                        'color': status_color
+                    })
+                ], style={'border': f'2px solid {status_color}', 'padding': '1rem', 'border-radius': '0.5rem', 'margin-bottom': '1rem'})
+            ]),
+            html.P([html.Strong("Total Prompts: "), str(total_prompts)]),
+            html.P([html.Strong("Prompts Passed: "), str(prompts_passed)]),
+            html.P([html.Strong("Average Score: "), f"{average_score:.1f}/100"]),
+            html.P([html.Strong("Critical Failures: "), str(critical_failures)]),
+            html.P([html.Strong("Evaluation Date: "), data.get('timestamp', '').split('T')[0] if data.get('timestamp') else 'Unknown'])
+        ]
+        
+        sections.append(html.Div(summary_content, className="card"))
+        
+        # Rule Type Performance Chart
+        metrics = data.get('metrics', {})
+        pass_rates_by_type = metrics.get('pass_rates_by_type', {})
+        
+        if pass_rates_by_type:
+            # Filter out rule types with 0 total rules
+            total_rules_by_type = metrics.get('total_rules_by_type', {})
+            filtered_rates = {}
+            
+            for rule_type, pass_rate in pass_rates_by_type.items():
+                total_rules = total_rules_by_type.get(rule_type, {}).get('total', 0)
+                if total_rules > 0:
+                    filtered_rates[rule_type] = pass_rate
+            
+            if filtered_rates:
+                rule_types = list(filtered_rates.keys())
+                pass_rates = list(filtered_rates.values())
+                
+                # Get the actual rule counts for labels
+                rule_counts = []
+                for rule_type in rule_types:
+                    rules_data = total_rules_by_type.get(rule_type, {})
+                    passed = rules_data.get('passed', 0)
+                    total = rules_data.get('total', 0)
+                    rule_counts.append(f"{passed}/{total}")
+                
+                # Create bar chart with custom hover text and annotations
+                fig = go.Figure()
+                
+                # Add bars
+                fig.add_trace(go.Bar(
+                    x=[rt.title() for rt in rule_types],
+                    y=pass_rates,
+                    text=[f"{rate:.1f}%<br>{count} rules" for rate, count in zip(pass_rates, rule_counts)],
+                    textposition='auto',
+                    marker_color=[self._get_score_color(rate) for rate in pass_rates],
+                    hovertemplate='<b>%{x}</b><br>Pass Rate: %{y:.1f}%<br>Rules Passed: %{customdata}<extra></extra>',
+                    customdata=rule_counts
+                ))
+                
+                fig.update_layout(
+                    title="Pass Rates by Rule Type",
+                    xaxis_title="Rule Type",
+                    yaxis_title="Pass Rate (%)",
+                    font=dict(family="Inter, sans-serif"),
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    margin=dict(l=0, r=0, t=40, b=0),
+                    yaxis_range=[0, 100],
+                    showlegend=False
+                )
+                
+                rule_chart = dcc.Graph(figure=fig)
+                
+                sections.append(html.Div([
+                    html.H3("Rule Type Performance"),
+                    rule_chart
+                ], className="card"))
+        
+        # Database and Configuration Information - Side by Side
+        db_stats = metrics.get('database_stats', {})
+        config = metrics.get('config', {})
+        
+        if db_stats or config:
+            info_row = []
+            
+            # Knowledge Base Information
+            if db_stats:
+                db_content = [
+                    html.H3("Knowledge Base Information"),
+                    html.P([html.Strong("Total Documents: "), str(db_stats.get('total_documents', 0))]),
+                    html.P([html.Strong("Content Chunks: "), str(db_stats.get('total_chunks', 0))]),
+                    html.P([html.Strong("Embedding Model: "), db_stats.get('embedding_model', 'Unknown')]),
+                    html.P([html.Strong("Collection: "), db_stats.get('collection_name', 'Unknown')]),
+                    html.P([html.Strong("Chunk Size: "), f"{db_stats.get('chunk_size', 0)} characters"]),
+                    html.P([html.Strong("Chunk Overlap: "), f"{db_stats.get('chunk_overlap', 0)} characters"])
+                ]
+                
+                # Add content sources breakdown
+                sources = db_stats.get('sources', {})
+                if sources:
+                    sources_list = []
+                    for source_type, count in sources.items():
+                        sources_list.append(html.Li(f"{source_type.title()}: {count} chunks"))
+                    
+                    db_content.extend([
+                        html.Hr(),
+                        html.Strong("Content Sources:"),
+                        html.Ul(sources_list, style={'margin-top': '0.5rem'})
+                    ])
+                
+                info_row.append(html.Div(db_content, className="card", style={
+                    'flex': '1',
+                    'min-width': '300px',
+                    'margin-right': '0.5rem'
+                }))
+            
+            # Configuration Information
+            if config:
+                config_content = [
+                    html.H3("Evaluation Configuration"),
+                    html.P([html.Strong("Passing Score Threshold: "), f"{config.get('passing_score', 60)}%"]),
+                    html.P([html.Strong("Content Source: "), config.get('content_type', 'Unknown').title()])
+                ]
+                
+                # Add rule weights
+                weights = config.get('weights', {})
+                if weights:
+                    weights_list = []
+                    for rule_type, weight in weights.items():
+                        weights_list.append(html.Li(f"{rule_type.title()}: {weight}%"))
+                    
+                    config_content.extend([
+                        html.Hr(),
+                        html.Strong("Rule Type Weights:"),
+                        html.Ul(weights_list, style={'margin-top': '0.5rem'})
+                    ])
+                
+                info_row.append(html.Div(config_content, className="card", style={
+                    'flex': '1',
+                    'min-width': '300px',
+                    'margin-left': '0.5rem'
+                }))
+            
+            # Add the row with both cards
+            sections.append(html.Div(info_row, style={
+                'display': 'flex',
+                'gap': '0',
+                'margin-bottom': '1rem',
+                'flex-wrap': 'wrap'
+            }))
+        
+        # Detailed Prompt Analysis
+        prompt_data = data.get('data', {}).get('prompt_evaluations', [])
+        if prompt_data:
+            prompt_analysis = [html.H3("Detailed Prompt Analysis")]
+            
+            for prompt_result in prompt_data:
+                prompt_num = prompt_result.get('prompt_number', 0)
+                score = prompt_result.get('score', 0)
+                passed = prompt_result.get('passed', False)
+                prompt_text = prompt_result.get('prompt_text', '')
+                summary_text = prompt_result.get('summary', '')
+                rules_passed = prompt_result.get('rules_passed', 0)
+                total_rules = prompt_result.get('total_rules', 0)
+                critical_failed = prompt_result.get('critical_failed', False)
+                
+                result_color = '#28A745' if passed else '#DC2626'
+                result_icon = "✅" if passed else "❌"
+                
+                # Create a more detailed analysis card
+                prompt_card = html.Div([
+                    # Header with status and score
+                    html.Div([
+                        html.Div([
+                            html.H4(f"Prompt {prompt_num}", style={'margin': '0'}),
+                            html.Div(result_icon, style={'font-size': '1.5rem', 'margin-left': '1rem'})
+                        ], style={'display': 'flex', 'align-items': 'center'}),
+                        html.Div([
+                            html.Div(f"{min(100, score):.0f}/100", style={
+                                'font-size': '2rem',
+                                'font-weight': 'bold',
+                                'color': result_color,
+                                'text-align': 'right'
+                            }),
+                            html.Div("FAILED" if not passed else "PASSED", style={
+                                'font-size': '0.9rem',
+                                'color': result_color,
+                                'text-align': 'right',
+                                'font-weight': 'bold'
+                            })
+                        ])
+                    ], style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center', 'margin-bottom': '1rem'}),
+                    
+                    # Prompt text
+                    html.Div([
+                        html.Strong("Prompt:"),
+                        html.P(prompt_text, style={'margin': '0.5rem 0', 'font-style': 'italic'})
+                    ], style={
+                        'margin-bottom': '1rem', 
+                        'padding': '0.75rem', 
+                        'background': 'var(--bg-hover)', 
+                        'border-radius': '0.25rem',
+                        'border': '1px solid var(--border-color)'
+                    }),
+                    
+                    # Rules performance
+                    html.Div([
+                        html.Div([
+                            html.Strong("Rules Performance:"),
+                            html.Span(f" {rules_passed} of {total_rules} rules satisfied", 
+                                     style={'margin-left': '0.5rem'})
+                        ], style={'margin-bottom': '0.5rem'}),
+                        
+                        # Progress bar
+                        html.Div([
+                            html.Div(style={
+                                'width': f"{(rules_passed/total_rules*100) if total_rules > 0 else 0}%",
+                                'height': '8px',
+                                'background': result_color,
+                                'border-radius': '4px',
+                                'transition': 'width 0.3s ease'
+                            })
+                        ], style={
+                            'width': '100%',
+                            'height': '8px',
+                            'background': 'var(--bg-hover)',
+                            'border-radius': '4px',
+                            'margin-bottom': '1rem',
+                            'border': '1px solid var(--border-color)'
+                        })
+                    ]),
+                    
+                    # Critical failure warning if applicable
+                    html.Div([
+                        html.Div([
+                            html.Span("⚠️", style={'font-size': '1.2rem', 'margin-right': '0.5rem'}),
+                            html.Strong("Critical Rule Failed", style={'color': '#DC2626'})
+                        ], style={'display': 'flex', 'align-items': 'center'})
+                    ], style={'margin-bottom': '1rem', 'padding': '0.5rem', 'background': '#FEE2E2', 'border-radius': '0.25rem', 'border': '1px solid #DC2626'}) if critical_failed else None,
+                    
+                    # Analysis summary
+                    html.Div([
+                        html.Strong("Analysis Summary:"),
+                        html.P(summary_text, style={'margin': '0.5rem 0', 'line-height': '1.6'})
+                    ])
+                    
+                ], style={
+                    'border-left': f'4px solid {result_color}',
+                    'padding': '1.5rem',
+                    'margin': '1.5rem 0',
+                    'background': 'var(--bg-card)',
+                    'border-radius': '0.5rem',
+                    'box-shadow': '0 1px 3px rgba(0,0,0,0.1)'
+                })
+                
+                prompt_analysis.append(prompt_card)
+            
+            sections.append(html.Div(prompt_analysis, className="card"))
+        
+        return html.Div(sections)
     
     def _get_score_color(self, score: float) -> str:
         """Get color based on score"""
