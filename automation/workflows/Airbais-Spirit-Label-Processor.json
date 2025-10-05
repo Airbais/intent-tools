@@ -49,17 +49,6 @@
     },
     {
       "parameters": {},
-      "id": "543d8653-fc2e-4911-a8d8-6a1d6ffa6f5e",
-      "name": "Success Notification",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
-      "position": [
-        2560,
-        528
-      ]
-    },
-    {
-      "parameters": {},
       "id": "59cd2382-8d23-4b07-8869-84a0415af02b",
       "name": "No Files Found Error",
       "type": "n8n-nodes-base.noOp",
@@ -430,6 +419,17 @@
       ],
       "id": "d0a46b26-a096-447a-a32a-07a1bd006749",
       "name": "Create File List"
+    },
+    {
+      "parameters": {},
+      "id": "543d8653-fc2e-4911-a8d8-6a1d6ffa6f5e",
+      "name": "Notify Success",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2560,
+        528
+      ]
     }
   ],
   "pinData": {},
@@ -511,7 +511,7 @@
       "main": [
         [
           {
-            "node": "Success Notification",
+            "node": "Notify Success",
             "type": "main",
             "index": 0
           }
@@ -524,17 +524,6 @@
         [
           {
             "node": "Read Image Content",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Success Notification": {
-      "main": [
-        [
-          {
-            "node": "Loop Over Items",
             "type": "main",
             "index": 0
           }
@@ -646,13 +635,24 @@
           }
         ]
       ]
+    },
+    "Notify Success": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "254053b0-8121-4c8d-b5ea-7da88905817f",
+  "versionId": "053e7231-7f5e-456e-9c44-b6b2f6e71121",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "b667caaf26d1d42eea7d88af9875dda2df849802c97a94bd2bc11daafe7f8a41"
