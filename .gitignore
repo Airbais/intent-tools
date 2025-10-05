@@ -5,7 +5,9 @@ projectplan.md
 .claude/
 **.mdx
 CLAUDE.md
+AGENTS.md
 rulesevaluator/requirements.md
 rulesevaluator/questions.md
 rulesevaluator/PROJECT_PLAN.md
 rules/airbais_rules.json
+.github/

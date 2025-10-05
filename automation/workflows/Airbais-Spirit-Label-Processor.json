@@ -1,0 +1,669 @@
+{
+  "name": "Process Labels",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ $json.stdout.trim() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "3d88266b-25d3-4d0d-b7d3-d3d0f316dac5",
+      "name": "Check If File Found",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the original file path from the Find Newest MD File node\nconst fileName = $('Read Image Content').first().json.fileName;\nconst originalFilePath = $('Create File List').first().json.directory +\"/\" + fileName;\nconst destinationPath = $('Variables').first().json.imageDest+\"/\" + fileName;\n\nreturn {\n  originalFilePath: originalFilePath,\n  fileName: fileName,\n  destinationPath: destinationPath\n};"
+      },
+      "id": "2000602f-003f-4671-bb09-8a6bce103164",
+      "name": "Prepare File Paths",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1536,
+        528
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "543d8653-fc2e-4911-a8d8-6a1d6ffa6f5e",
+      "name": "Success Notification",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2560,
+        528
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "59cd2382-8d23-4b07-8869-84a0415af02b",
+      "name": "No Files Found Error",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        736
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert in wine, bourbon, and whiskey. You're going to look at images of bottle labels and extract relevant data for a database. I want you to look for the following values from the labels:\n\nLabel: The name of the sprit\nMaker: The maker of the spirit\nCategory: Choose only between Bourbon or Wine\nType: The specific type of spirit\nProof: The proof of the spririt if it is not wine\nYear: The year if it is a wine\n\nYou will output these in a clean JSON structure with name value pairs for each. Here's are two examples:\n\n[\n    \"label\": \"Maker's Mark\",\n    \"maker\": \"Maker's Mark Distillery\",\n    \"category\": Bourbon,\n    \"type\": \"Kentucky Straight Bourbon Whiskey\",\n    \"proof\": 90\n]\n\nand\n\n[\n    \"label\": \"Conundrum\",\n    \"maker\": \"Caymus Vineyard\",\n    \"category\": Wine,\n    \"type\": \"Cabernet Sauvignon\",\n    \"year\": 2020\n]\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        928,
+        528
+      ],
+      "id": "a28a9f2b-147b-4e79-af75-a625d0923094",
+      "name": "Label Processor",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-exp-image-generation",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        928,
+        752
+      ],
+      "id": "e839f870-6487-4adb-8ad3-8f27bbe297c3",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YvPxvxBYrPIqyitS",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=find {{ $json.labelSource }} \\( -name \"*.jpg\" -o -name \"*.png\" \\) -type f"
+      },
+      "id": "d2a4a8c7-e995-4edc-8d75-85b77fbd26ce",
+      "name": "Find Image File",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "let raw = items[0].json.output || items[0].json.message || '[]';\n\n// Remove markdown code block wrapper like ```json ... ```\nraw = raw.replace(/```json|```/g, '').trim();\n\nconst details = JSON.parse(raw);\n\nreturn { details };\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1264,
+        528
+      ],
+      "id": "27d91614-e87a-4113-8381-e5a5f831dee7",
+      "name": "Clean JSON"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{ $('Variables').item.json.notesLocation }}{{ $('Clean JSON').item.json.details[0].category }}/{{ $('Clean JSON').item.json.details[0].label }}.md",
+        "options": {
+          "append": false
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        2352,
+        528
+      ],
+      "id": "9dabeb27-d66f-4126-80f9-9baaf1cfd74f",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        512,
+        512
+      ],
+      "id": "6eec8612-9015-41a8-a888-94730ca72958",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"filecontent\": \"---\\nLabel: {{ $('Clean JSON').item.json.details[0].label }}\\nMaker: {{ $('Clean JSON').item.json.details[0].maker }}\\nType: {{ $('Clean JSON').item.json.details[0].type }}\\nProof: {{ $('Clean JSON').item.json.details[0].proof }}\\nPrice: \\nScore: \\n---\\n<img src='/images/{{ $('Prepare File Paths').item.json.fileName }}' alt='alt text' width='50%'>\\n\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2016,
+        368
+      ],
+      "id": "7c2b1ed8-21f4-43aa-9ca4-51cd98853360",
+      "name": "Create Bourbon Entry"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Clean JSON').item.json.details[0].category }}",
+                    "rightValue": "Bourbon",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "4d3a39f3-3eb8-46b1-8efc-5f4dc3521b03"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b9863eca-2e37-444c-a1d5-681e2d74a725",
+                    "leftValue": "={{ $('Clean JSON').item.json.details[0].category }}",
+                    "rightValue": "Wine",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1904,
+        528
+      ],
+      "id": "87ea3ccf-a4d8-45a3-bdff-720a0e593a21",
+      "name": "Switch"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        528
+      ],
+      "id": "85a699bc-6a12-4430-9061-806f3bb15580",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"filecontent\": \"---\\nLabel: {{ $('Clean JSON').item.json.details[0].label }}\\nMaker: {{ $('Clean JSON').item.json.details[0].maker }}\\nType: {{ $('Clean JSON').item.json.details[0].type }}\\nYear: {{ $('Clean JSON').item.json.details[0].year }}\\nPrice: \\nScore: \\n---\\n<img src='/images/{{ $('Prepare File Paths').item.json.fileName }}' alt='alt text' width='50%'>\\n\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2032,
+        672
+      ],
+      "id": "4f184538-1ce9-4871-8010-bdd0bd4560be",
+      "name": "Create Wine Entry"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eb650c76-3a1a-47e8-82fa-eb9c47440347",
+              "name": "labelSource",
+              "value": "/home/user/automation/labels/",
+              "type": "string"
+            },
+            {
+              "id": "09c54369-0e03-4460-940a-ab05418cf5fa",
+              "name": "imageDest",
+              "value": "/home/user/Notes/images/",
+              "type": "string"
+            },
+            {
+              "id": "1d40cac7-b693-4c17-9022-ffe41e81c7ad",
+              "name": "notesLocation",
+              "value": "/home/user/Notes/Spirits/",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -544,
+        528
+      ],
+      "id": "dda69fc4-83a0-46ff-b391-0ec5d8ead8d8",
+      "name": "Variables"
+    },
+    {
+      "parameters": {
+        "content": "## This is the setup\n####Variables\nUse the variables node to set the location of files.\n- **labelSource** = The location where the images can be found. This is the place where you copy the images you took from your phone so the automation can find them\n- **imageDest** = The location to where the label image will be copied, so your notebook can find them. This really could be any location but I like to keep images in my notebook folder so when everything syncs to the cloud my notebook still works on mobile, etc.\n- **notesLocation** = The location of my spirits notebook files.\n\nThe next two nodes look for files in the labelSource location and confirm the images are there.",
+        "height": 688,
+        "width": 912
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -880,
+        224
+      ],
+      "typeVersion": 1,
+      "id": "44e6f1ce-6171-4ffc-99e8-2a82d6f5b7bd",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Process spirit lablels\nTakes information from labels and turns it into data!",
+        "height": 112,
+        "width": 272,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -880,
+        48
+      ],
+      "typeVersion": 1,
+      "id": "3fcd4b88-0c93-4916-b6c6-6a29b2452c2d",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## File list \nThis node creates a JSON file for all the available images in the labelSource location.",
+        "height": 688,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        112,
+        224
+      ],
+      "typeVersion": 1,
+      "id": "56e7ee77-bfce-48ea-9806-0ce2e4bd74b1",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Data extraction\nThis section processes each image by running it through Gemini vision and extracting the relevant data. It also selects a category (wine or bourbon)",
+        "height": 688,
+        "width": 944,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        448,
+        224
+      ],
+      "typeVersion": 1,
+      "id": "5789e0fc-b2cc-459b-8fc9-d888b65fa3f5",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Note creation\nThe lasts steps are:\n1. Move the image to the final destination.\n2. Generate the markdown for the note.\n3. Add the note to the notebook folder.\n4. This repeats for every image in the source folder. \n\nYou can see that it creates a different markdown for each -->\ncategory, so this could be expanded to include any other \ncategories you want.",
+        "height": 688,
+        "width": 1232,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1504,
+        224
+      ],
+      "typeVersion": 1,
+      "id": "42b321e1-6d72-4c35-909a-e331b0615e9a",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "command": "=mv \"{{ $json.originalFilePath }}\" \"{{ $json.destinationPath }}\""
+      },
+      "id": "0013dcfe-5508-4797-84f1-7e6dbcb2b66f",
+      "name": "Move Image to Destination",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1728,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const textContent = $input.first().json.filecontent;\nconst binaryData = Buffer.from(textContent, 'utf8');\n\nreturn {\n  json: {},\n  binary: {\n    data: {\n      data: binaryData,\n      mimeType: 'text/plain',\n      fileName: $('Clean JSON').first().json.details.label+'.md'\n    }\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2144,
+        528
+      ],
+      "id": "f1cb0df8-f391-4d8a-a248-791fb74868e4",
+      "name": "Create File"
+    },
+    {
+      "parameters": {
+        "fileSelector": "={{ $json.filepath }}",
+        "options": {}
+      },
+      "id": "672de665-f0b8-4c68-9505-0b77de71a66a",
+      "name": "Read Image Content",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        736,
+        528
+      ],
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input from the previous node\nconst stdout = $input.first().json.stdout;\n\n// Split by newlines and filter out empty strings\nconst files = stdout.trim().split('\\n').filter(file => file.length > 0);\n\n// Create structured output\nconst result = files.map((filepath, index) => {\n  const filename = filepath.split('/').pop(); // Get just the filename\n  return {\n    filepath: filepath,\n    filename: filename,\n    directory: filepath.substring(0, filepath.lastIndexOf('/'))\n  };\n});\n\nreturn result.map(item => ({ json: item }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        176,
+        512
+      ],
+      "id": "d0a46b26-a096-447a-a32a-07a1bd006749",
+      "name": "Create File List"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Check If File Found": {
+      "main": [
+        [
+          {
+            "node": "Create File List",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Files Found Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare File Paths": {
+      "main": [
+        [
+          {
+            "node": "Move Image to Destination",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Label Processor": {
+      "main": [
+        [
+          {
+            "node": "Clean JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Label Processor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Image File": {
+      "main": [
+        [
+          {
+            "node": "Check If File Found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean JSON": {
+      "main": [
+        [
+          {
+            "node": "Prepare File Paths",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Success Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Read Image Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Success Notification": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Bourbon Entry": {
+      "main": [
+        [
+          {
+            "node": "Create File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Create Bourbon Entry",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Wine Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Wine Entry": {
+      "main": [
+        [
+          {
+            "node": "Create File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Variables": {
+      "main": [
+        [
+          {
+            "node": "Find Image File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Image to Destination": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create File": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Image Content": {
+      "main": [
+        [
+          {
+            "node": "Label Processor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create File List": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "254053b0-8121-4c8d-b5ea-7da88905817f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b667caaf26d1d42eea7d88af9875dda2df849802c97a94bd2bc11daafe7f8a41"
+  },
+  "id": "N8UxNY8cThhBdp5A",
+  "tags": [
+    {
+      "createdAt": "2025-07-24T00:45:13.225Z",
+      "updatedAt": "2025-07-24T00:45:13.225Z",
+      "id": "wyB9lx5Q4a558gFA",
+      "name": "Airbias"
+    }
+  ]
+}
