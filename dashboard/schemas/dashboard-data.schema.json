@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://airbais.com/schemas/dashboard-data/v1.0.0",
+  "title": "Dashboard Data Schema",
+  "description": "Schema for dashboard-data.json files produced by Airbais tools",
+  "type": "object",
+  "required": ["tool_type", "timestamp"],
+  "properties": {
+    "tool_type": {
+      "type": "string",
+      "description": "Identifier for the tool that generated this data",
+      "enum": [
+        "intentcrawler",
+        "graspevaluator",
+        "llmevaluator",
+        "geoevaluator",
+        "rulesevaluator",
+        "llmstxtgenerator"
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "ISO 8601 timestamp when the data was generated",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(Z|[+-]\\d{2}:\\d{2})$"
+    },
+    "summary": {
+      "type": "object",
+      "description": "High-level summary information about the analysis"
+    },
+    "metrics": {
+      "type": "object",
+      "description": "Quantitative metrics from the analysis"
+    },
+    "data": {
+      "type": "object",
+      "description": "Detailed analysis data specific to the tool"
+    }
+  },
+  "additionalProperties": true
+}
