@@ -531,6 +531,7 @@ class GEOAnalysisPipeline:
         
         # Format data for dashboard integration
         dashboard_data = {
+            'tool_type': 'geoevaluator',
             'metadata': results['metadata'],
             'overall_score': results['overall_score'],
             'analysis_summary': results['analysis_summary'],

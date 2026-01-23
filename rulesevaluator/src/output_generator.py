@@ -581,6 +581,7 @@ Based on the evaluation results, here are key recommendations for improvement:
             })
         
         return {
+            "tool_type": "rulesevaluator",
             "tool": "rulesevaluator",
             "timestamp": results['timestamp'],
             "summary": {

@@ -255,6 +255,7 @@ generator: LLMS.txt Generator by Airbais
         
         # Format data to match dashboard expectations
         dashboard_data = {
+            'tool_type': 'llmstxtgenerator',
             'metadata': {
                 'timestamp': datetime.now().isoformat(),
                 'tool_name': 'llmstxtgenerator',
