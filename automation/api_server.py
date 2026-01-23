@@ -18,6 +18,9 @@ import traceback
 # Add parent directory to path to import tools
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# Import error handlers
+from error_handlers import register_error_handlers
+
 # Configure logging first
 logging.basicConfig(
     level=logging.INFO,
@@ -45,6 +48,9 @@ TIMEOUT_CONFIG = config.get('timeouts', {})
 app = Flask(__name__)
 if SERVER_CONFIG.get('cors_enabled', True):
     CORS(app)  # Enable CORS for N8N
+
+# Register error handlers for sanitized error responses
+register_error_handlers(app)
 
 # Job storage (in production, use Redis or database)
 jobs = {}  # Changed from defaultdict(dict) to regular dict
@@ -212,7 +218,7 @@ def run_tool_async(job_id, tool_name, params):
         logger.error(traceback.format_exc())
         update_job(job_id, {
             'status': 'failed',
-            'error': str(e),
+            'error': 'Tool execution failed. Check server logs for details.',
             'completed_at': datetime.now().isoformat()
         })
 
@@ -271,10 +277,13 @@ def analyze(tool_name):
             'status': 'queued',
             'message': f'{TOOL_CONFIGS[tool_name]["name"]} analysis started'
         }), 202
-        
+
     except Exception as e:
-        logger.error(f"Error starting analysis: {str(e)}")
-        return jsonify({'error': 'Failed to start analysis'}), 500
+        logger.error(f"Error starting analysis: {str(e)}", exc_info=True)
+        return jsonify({
+            'error': 'Failed to start analysis',
+            'message': 'Please check server logs for details'
+        }), 500
 
 @app.route('/status/<job_id>', methods=['GET'])
 def get_status(job_id):
