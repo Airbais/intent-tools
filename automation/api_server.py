@@ -10,6 +10,8 @@ import uuid
 import re
 from datetime import datetime
 from flask import Flask, request, jsonify
+from flask_pydantic import validate
+from pydantic import ValidationError
 from collections import defaultdict
 import logging
 import traceback
@@ -20,6 +22,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Import error handlers and security config
 from error_handlers import register_error_handlers
 from security.cors_config import configure_cors
+from validation.request_models import AnalyzeRequest, JobIdPath
 
 # Configure logging first
 logging.basicConfig(
@@ -233,17 +236,19 @@ def health_check():
     })
 
 @app.route('/<tool_name>/analyze', methods=['POST'])
-def analyze(tool_name):
+@validate()
+def analyze(tool_name, body: AnalyzeRequest):
     """Start analysis for a specific tool"""
     if tool_name not in TOOL_CONFIGS:
         return jsonify({
             'error': f'Unknown tool: {tool_name}',
             'available_tools': list(TOOL_CONFIGS.keys())
         }), 404
-    
+
     try:
-        params = request.get_json() or {}
-        
+        # Convert Pydantic model to dict, excluding None values
+        params = body.model_dump(exclude_none=True)
+
         # Validate required parameters based on config
         required_params = TOOL_CONFIGS[tool_name].get('required_params', [])
         missing_params = [p for p in required_params if p not in params]
@@ -253,7 +258,7 @@ def analyze(tool_name):
                 'required': required_params,
                 'optional': TOOL_CONFIGS[tool_name].get('optional_params', [])
             }), 400
-        
+
         # Create job
         job_id = create_job(tool_name)
         
@@ -288,25 +293,21 @@ def analyze(tool_name):
 @app.route('/status/<job_id>', methods=['GET'])
 def get_status(job_id):
     """Get job status"""
-    # Clean up job_id - remove any trailing special characters
-    original_id = job_id
-    # Remove any non-alphanumeric characters from the end (except hyphens)
-    job_id = re.sub(r'[^a-zA-Z0-9\-]+$', '', job_id).strip()
-    
-    if original_id != job_id:
-        logger.info(f"Cleaned job_id from '{original_id}' to '{job_id}'")
-    
-    logger.info(f"Status request for job: {job_id}")
+    # Validate path parameter using Pydantic model
+    try:
+        validated = JobIdPath(job_id=job_id)
+    except ValidationError as e:
+        return jsonify({'error': 'Invalid job ID format', 'details': e.errors()}), 400
+
+    logger.info(f"Status request for job: {validated.job_id}")
     logger.debug(f"Available jobs: {list(jobs.keys())}")
-    
-    job = get_job(job_id)
+
+    job = get_job(validated.job_id)
     if not job:
-        logger.warning(f"Job {job_id} not found in {len(jobs)} jobs")
+        logger.warning(f"Job {validated.job_id} not found in {len(jobs)} jobs")
         return jsonify({
             'error': 'Job not found',
-            'requested_id': original_id,
-            'cleaned_id': job_id,
-            'available_jobs': list(jobs.keys())
+            'job_id': validated.job_id
         }), 404
     
     response = {
@@ -326,16 +327,15 @@ def get_status(job_id):
 @app.route('/results/<job_id>', methods=['GET'])
 def get_results(job_id):
     """Get job results"""
-    # Clean up job_id - remove any trailing special characters
-    original_id = job_id
-    job_id = re.sub(r'[^a-zA-Z0-9\-]+$', '', job_id).strip()
-    
-    if original_id != job_id:
-        logger.info(f"Cleaned job_id from '{original_id}' to '{job_id}'")
-    
-    job = get_job(job_id)
+    # Validate path parameter using Pydantic model
+    try:
+        validated = JobIdPath(job_id=job_id)
+    except ValidationError as e:
+        return jsonify({'error': 'Invalid job ID format', 'details': e.errors()}), 400
+
+    job = get_job(validated.job_id)
     if not job:
-        return jsonify({'error': 'Job not found', 'cleaned_id': job_id}), 404
+        return jsonify({'error': 'Job not found', 'job_id': validated.job_id}), 404
     
     if job['status'] != 'completed':
         return jsonify({
