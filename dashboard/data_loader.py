@@ -12,18 +12,36 @@ from datetime import datetime
 import glob
 import yaml
 
+try:
+    from dashboard.schema_validator import DashboardDataValidator
+    VALIDATOR_AVAILABLE = True
+except ImportError as e:
+    logging.getLogger(__name__).warning(f"Schema validator unavailable: {e}")
+    DashboardDataValidator = None
+    VALIDATOR_AVAILABLE = False
+
 class ToolDataLoader:
     def __init__(self, tools_root_path: str = None):
         self.logger = logging.getLogger(__name__)
-        
+
         # Set the tools root path
         if tools_root_path:
             self.tools_root = Path(tools_root_path)
         else:
             # Auto-detect: this file is in tools/dashboard/, so tools root is parent
             self.tools_root = Path(__file__).parent.parent
-        
+
         self.logger.info(f"Tools root path: {self.tools_root}")
+
+        # Initialize schema validator (cached for performance)
+        if VALIDATOR_AVAILABLE and DashboardDataValidator is not None:
+            try:
+                self._validator = DashboardDataValidator()
+            except Exception as e:
+                self.logger.warning(f"Could not initialize schema validator: {e}")
+                self._validator = None
+        else:
+            self._validator = None
     
     def get_tool_display_name(self, tool_name: str) -> str:
         """Get the display name for a tool from its config file, with fallback to formatted tool name"""
@@ -120,7 +138,16 @@ class ToolDataLoader:
         try:
             with open(data_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-            
+
+            # Validate data against schema (warn only, don't fail)
+            if self._validator:
+                is_valid, errors = self._validator.validate(data)
+                if not is_valid:
+                    self.logger.warning(
+                        f"Schema validation failed for {data_file}:\n  " +
+                        "\n  ".join(errors)
+                    )
+
             # Detect tool type first
             tool_type = self._detect_tool_type(data)
             
