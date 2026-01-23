@@ -22,6 +22,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Import error handlers and security config
 from error_handlers import register_error_handlers
 from security.cors_config import configure_cors
+from security.talisman_config import configure_talisman
 from security.subprocess_validator import build_safe_command, validate_tool_directory
 from validation.request_models import AnalyzeRequest, JobIdPath
 
@@ -52,9 +53,7 @@ TIMEOUT_CONFIG = config.get('timeouts', {})
 app = Flask(__name__)
 register_error_handlers(app)
 configure_cors(app, config)
-
-# Register error handlers for sanitized error responses
-register_error_handlers(app)
+configure_talisman(app)
 
 # Job storage (in production, use Redis or database)
 jobs = {}  # Changed from defaultdict(dict) to regular dict
