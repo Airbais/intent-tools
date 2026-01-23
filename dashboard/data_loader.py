@@ -141,12 +141,22 @@ class ToolDataLoader:
 
             # Validate data against schema (warn only, don't fail)
             if self._validator:
-                is_valid, errors = self._validator.validate(data)
-                if not is_valid:
-                    self.logger.warning(
-                        f"Schema validation failed for {data_file}:\n  " +
-                        "\n  ".join(errors)
-                    )
+                try:
+                    is_valid, errors = self._validator.validate(data)
+                    if not is_valid:
+                        self.logger.warning(
+                            f"Schema validation failed for {data_file}:\n  " +
+                            "\n  ".join(errors)
+                        )
+                    else:
+                        self.logger.debug(f"Schema validation passed for {data_file}")
+                except Exception as e:
+                    # Never let validation errors prevent data loading
+                    self.logger.warning(f"Error during schema validation for {data_file}: {e}")
+            else:
+                self.logger.debug(
+                    f"Schema validator not available, skipping validation for {data_file}"
+                )
 
             # Detect tool type first
             tool_type = self._detect_tool_type(data)
@@ -176,17 +186,23 @@ class ToolDataLoader:
         # 1. Check for explicit tool_type field (new standard)
         if 'tool_type' in data:
             tool_type = data['tool_type']
-            self.logger.debug(f"Using explicit tool_type: {tool_type}")
+            if not isinstance(tool_type, str):
+                self.logger.warning(
+                    f"tool_type field has invalid type {type(tool_type).__name__}, "
+                    f"expected str. Value: {tool_type}"
+                )
+                # Continue processing anyway - backwards compatibility
+            self.logger.debug(f"Using explicit tool_type field: '{tool_type}'")
             return tool_type
 
         # 2. Check for legacy 'tool' field (some tools use this)
         if 'tool' in data:
             tool = data['tool']
-            self.logger.debug(f"Using legacy 'tool' field: {tool}")
+            self.logger.debug(f"Using legacy 'tool' field: '{tool}'")
             return tool
 
         # 3. Fall back to heuristic detection for legacy files
-        self.logger.debug("Using heuristic detection for tool type")
+        self.logger.debug("No explicit tool_type field found, using heuristic detection")
         return self._detect_tool_type_heuristic(data)
 
     def _detect_tool_type_heuristic(self, data: Dict) -> str:
