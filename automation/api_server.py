@@ -22,6 +22,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Import error handlers and security config
 from error_handlers import register_error_handlers
 from security.cors_config import configure_cors
+from security.subprocess_validator import build_safe_command, validate_tool_directory
 from validation.request_models import AnalyzeRequest, JobIdPath
 
 # Configure logging first
@@ -94,64 +95,32 @@ def run_tool_async(job_id, tool_name, params):
     """Run tool in background thread"""
     try:
         update_job(job_id, {'status': 'running'})
-        
+
         tool_config = TOOL_CONFIGS.get(tool_name)
         if not tool_config:
             raise ValueError(f"Unknown tool: {tool_name}")
-        
+
         # Build paths
         tools_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         tool_dir = os.path.join(tools_dir, tool_config['module_path'])
         tool_script = tool_config['script']
-        
-        # Use relative script name and run from tool's directory
-        cmd = ['python3', tool_script]
-        
-        # Add tool-specific parameters based on config
-        tool_params = tool_config.get('required_params', []) + tool_config.get('optional_params', [])
-        param_style = tool_config.get('param_style', 'flags')  # Default to flags style
-        
-        # Handle parameters based on style
-        if param_style == 'positional':
-            # URL is a positional argument (like intentcrawler)
-            if 'url' in params:
-                cmd.append(params['url'])
-            # Handle optional parameters with -- prefix
-            for param in tool_config.get('optional_params', []):
-                if param in params:
-                    cmd.extend([f'--{param.replace("_", "-")}', str(params[param])])
-        elif param_style == 'config_file':
-            # Config file is a positional argument (like llmevaluator)
-            if 'config' in params:
-                cmd.append(params['config'])
-            # Handle optional parameters with -- prefix
-            for param in tool_config.get('optional_params', []):
-                if param in params:
-                    # Special handling for boolean flags
-                    if param in ['no_cache', 'clear_cache', 'dry_run', 'dashboard']:
-                        if params[param]:  # Only add flag if True
-                            cmd.append(f'--{param.replace("_", "-")}')
-                    else:
-                        cmd.extend([f'--{param.replace("_", "-")}', str(params[param])])
-        else:
-            # All parameters use flags (default style)
-            # Handle required parameters
-            for param in tool_config.get('required_params', []):
-                if param in params:
-                    cmd.extend([f'--{param.replace("_", "-")}', str(params[param])])
-            
-            # Handle optional parameters
-            for param in tool_config.get('optional_params', []):
-                if param in params:
-                    # Special handling for output directory parameter
-                    if param == 'output' and tool_name == 'geoevaluator':
-                        cmd.extend(['--output-dir', str(params[param])])
-                    else:
-                        cmd.extend([f'--{param.replace("_", "-")}', str(params[param])])
-        
-        logger.info(f"Running command: {' '.join(cmd)} in directory: {tool_dir}")
-        
-        # Run the tool in its own directory
+        param_style = tool_config.get('param_style', 'flags')
+
+        # SECURITY: Build validated command
+        cmd = build_safe_command(
+            script=tool_script,
+            params=params,
+            tool_dir=tool_dir,
+            tool_config=tool_config,
+            param_style=param_style
+        )
+
+        if cmd is None:
+            raise ValueError("Command validation failed - check logs for details")
+
+        logger.info(f"Running validated command: {' '.join(cmd)} in directory: {tool_dir}")
+
+        # Run with shell=False (default, list args prevent injection)
         process = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,
