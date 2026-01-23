@@ -298,6 +298,7 @@ class GRASPEvaluator:
     def _prepare_dashboard_data(self, results: Dict) -> Dict:
         """Prepare data for dashboard display"""
         return {
+            "tool_type": "graspevaluator",
             "tool": "graspevaluator",
             "version": "1.0.0",
             "timestamp": results['timestamp'],
