@@ -8,6 +8,7 @@ from .subprocess_validator import (
     ALLOWED_SCRIPTS,
     ALLOWED_FLAGS,
 )
+from .talisman_config import configure_talisman, get_api_csp
 
 __all__ = [
     'configure_cors',
@@ -18,4 +19,6 @@ __all__ = [
     'validate_path_within_project',
     'ALLOWED_SCRIPTS',
     'ALLOWED_FLAGS',
+    'configure_talisman',
+    'get_api_csp',
 ]
