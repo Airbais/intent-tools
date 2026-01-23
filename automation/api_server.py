@@ -10,7 +10,6 @@ import uuid
 import re
 from datetime import datetime
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 from collections import defaultdict
 import logging
 import traceback
@@ -18,8 +17,9 @@ import traceback
 # Add parent directory to path to import tools
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Import error handlers
+# Import error handlers and security config
 from error_handlers import register_error_handlers
+from security.cors_config import configure_cors
 
 # Configure logging first
 logging.basicConfig(
@@ -46,8 +46,8 @@ SERVER_CONFIG = config.get('server', {})
 TIMEOUT_CONFIG = config.get('timeouts', {})
 
 app = Flask(__name__)
-if SERVER_CONFIG.get('cors_enabled', True):
-    CORS(app)  # Enable CORS for N8N
+register_error_handlers(app)
+configure_cors(app, config)
 
 # Register error handlers for sanitized error responses
 register_error_handlers(app)
