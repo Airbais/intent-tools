@@ -167,58 +167,82 @@ class ToolDataLoader:
             return None
     
     def _detect_tool_type(self, data: Dict) -> str:
-        """Detect what type of tool generated this data"""
-        
+        """
+        Detect what type of tool generated this data.
+
+        Uses explicit tool_type field first, falls back to heuristics for backwards compatibility.
+        """
+
+        # 1. Check for explicit tool_type field (new standard)
+        if 'tool_type' in data:
+            tool_type = data['tool_type']
+            self.logger.debug(f"Using explicit tool_type: {tool_type}")
+            return tool_type
+
+        # 2. Check for legacy 'tool' field (some tools use this)
+        if 'tool' in data:
+            tool = data['tool']
+            self.logger.debug(f"Using legacy 'tool' field: {tool}")
+            return tool
+
+        # 3. Fall back to heuristic detection for legacy files
+        self.logger.debug("Using heuristic detection for tool type")
+        return self._detect_tool_type_heuristic(data)
+
+    def _detect_tool_type_heuristic(self, data: Dict) -> str:
+        """
+        Detect tool type using heuristic analysis of data structure.
+
+        This method maintains backwards compatibility with files that don't
+        have an explicit tool_type field.
+        """
+
         # Intent Crawler detection
         if 'discovered_intents' in data and 'by_section' in data:
             return 'intentcrawler'
-        
+
         # LLM Evaluator detection - supports both old and new formats
         if 'evaluation_results' in data and 'aggregate_metrics' in data and 'brand_info' in data:
             return 'llmevaluator'
         # New multi-LLM format
         if 'metadata' in data and 'llm_metrics' in data and 'brand_info' in data:
             return 'llmevaluator'
-        
+
         # GEO Evaluator detection
         if 'overall_score' in data and 'analysis_summary' in data and 'recommendations' in data:
             metadata = data.get('metadata', {})
             if metadata.get('tool_name') == 'geoevaluator':
                 return 'geoevaluator'
-        
+
         # LLMS.txt Generator detection
         if 'generation_summary' in data and 'site_analysis' in data:
             metadata = data.get('metadata', {})
             if metadata.get('tool_name') == 'llmstxtgenerator':
                 return 'llmstxtgenerator'
-        
+
         # GRASP Evaluator detection
-        if 'tool' in data and data.get('tool') == 'graspevaluator':
-            return 'graspevaluator'
         if 'overall_score' in data and 'metrics' in data and 'breakdown' in data and 'recommendations' in data:
             # Check if it has GRASP-specific metrics
             metrics = data.get('metrics', {})
             if 'grounded' in metrics and 'readable' in metrics and 'accurate' in metrics:
                 return 'graspevaluator'
-        
+
         # Rules Evaluator detection
-        if 'tool' in data and data.get('tool') == 'rulesevaluator':
-            return 'rulesevaluator'
         if 'summary' in data and 'metrics' in data:
             # Check for Rules Evaluator specific structure
             summary = data.get('summary', {})
             metrics = data.get('metrics', {})
-            if ('total_prompts' in summary and 'overall_pass_rate' in summary and 
+            if ('total_prompts' in summary and 'overall_pass_rate' in summary and
                 'pass_rates_by_type' in metrics and 'database_stats' in metrics):
                 return 'rulesevaluator'
-        
+
         # Future tool types can be detected here
         # Example:
         # if 'sentiment_analysis' in data:
         #     return 'sentimentanalyzer'
         # if 'performance_metrics' in data:
         #     return 'performanceanalyzer'
-        
+
         return 'unknown'
     
     def _standardize_data(self, data: Dict) -> Dict:
