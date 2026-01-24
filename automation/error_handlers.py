@@ -16,7 +16,46 @@ from flask import jsonify
 from pydantic import ValidationError
 from werkzeug.exceptions import HTTPException
 
+from log_config.correlation import get_correlation_id
+from utils import utc_now_iso
+
 logger = structlog.get_logger(__name__)
+
+
+def build_error_response(
+    error: str,
+    message: str,
+    status_code: int = 500,
+    error_code: str = None,
+    details: dict = None
+) -> tuple:
+    """
+    Build a structured error response with correlation_id and timestamp.
+
+    Args:
+        error: Error type string (e.g., 'Not Found', 'ValidationError')
+        message: Human-readable error message
+        status_code: HTTP status code (default: 500)
+        error_code: Machine-readable error code (optional)
+        details: Additional error details (optional)
+
+    Returns:
+        Tuple of (jsonify response, status_code)
+    """
+    response = {
+        'error': error,
+        'message': message,
+        'timestamp': utc_now_iso(),
+        'correlation_id': get_correlation_id() or 'none',
+    }
+
+    if error_code is not None:
+        response['error_code'] = error_code
+
+    if details is not None:
+        response['details'] = details
+
+    return jsonify(response), status_code
 
 
 def handle_validation_error(e: ValidationError):
