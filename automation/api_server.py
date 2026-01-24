@@ -52,6 +52,7 @@ TIMEOUT_CONFIG = config.get('timeouts', {})
 
 app = Flask(__name__)
 configure_correlation(app)  # Must be first middleware
+configure_request_logging(app)  # Log all requests/responses with timing
 register_error_handlers(app)
 configure_cors(app, config)
 configure_talisman(app)
