@@ -7,11 +7,11 @@ SECURITY:
 - Path parameters are canonicalized to prevent traversal
 - Never uses shell=True
 """
-import logging
+import structlog
 from pathlib import Path
 from typing import List, Optional, Dict, Any
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 # Whitelist of allowed tool scripts - derived from tools_config.yaml
 ALLOWED_SCRIPTS = {
@@ -64,10 +64,10 @@ def validate_path_within_project(path: str, base_dir: Path = None) -> Optional[P
         return resolved_path
     except ValueError:
         # Path is outside base_dir
-        logger.warning(f"Path traversal attempt blocked: {path} resolves outside {base_dir}")
+        logger.warning("path_traversal_detected", path=str(path), project_root=str(base_dir))
         return None
     except OSError as e:
-        logger.warning(f"Invalid path: {path} - {e}")
+        logger.warning("invalid_path", path=str(path), error=str(e))
         return None
 
 
@@ -82,7 +82,7 @@ def validate_script(script: str) -> bool:
         True if script is allowed, False otherwise
     """
     if script not in ALLOWED_SCRIPTS:
-        logger.warning(f"Script not in whitelist: {script}")
+        logger.warning("script_not_allowed", script=script, allowed=list(ALLOWED_SCRIPTS))
         return False
     return True
 
@@ -101,11 +101,11 @@ def validate_tool_directory(tool_dir: str) -> Optional[Path]:
     validated = validate_path_within_project(tool_dir, project_root)
 
     if validated is None:
-        logger.error(f"Tool directory outside project: {tool_dir}")
+        logger.warning("tool_directory_outside_project", tool_dir=str(tool_dir), project_root=str(project_root))
         return None
 
     if not validated.is_dir():
-        logger.error(f"Tool directory does not exist: {tool_dir}")
+        logger.warning("tool_directory_not_found", tool_dir=str(tool_dir))
         return None
 
     return validated
@@ -162,7 +162,7 @@ def build_safe_command(
             if param in params:
                 flag = f'--{param.replace("_", "-")}'
                 if flag not in ALLOWED_FLAGS:
-                    logger.warning(f"Ignoring unallowed flag: {flag}")
+                    logger.warning("unknown_flag_rejected", flag=flag, allowed=list(ALLOWED_FLAGS))
                     continue
                 cmd.extend([flag, str(params[param])])
 
@@ -173,7 +173,7 @@ def build_safe_command(
             # Validate config path is within project
             validated_config = validate_path_within_project(config_path, validated_dir)
             if validated_config is None:
-                logger.error(f"Config file path invalid: {config_path}")
+                logger.warning("config_path_invalid", config_path=config_path)
                 return None
             cmd.append(str(validated_config))
 
@@ -187,7 +187,7 @@ def build_safe_command(
                 else:
                     flag = f'--{param.replace("_", "-")}'
                     if flag not in ALLOWED_FLAGS:
-                        logger.warning(f"Ignoring unallowed flag: {flag}")
+                        logger.warning("unknown_flag_rejected", flag=flag, allowed=list(ALLOWED_FLAGS))
                         continue
                     cmd.extend([flag, str(params[param])])
 
@@ -197,7 +197,7 @@ def build_safe_command(
             if param in params:
                 flag = f'--{param.replace("_", "-")}'
                 if flag not in ALLOWED_FLAGS:
-                    logger.warning(f"Ignoring unallowed flag: {flag}")
+                    logger.warning("unknown_flag_rejected", flag=flag, allowed=list(ALLOWED_FLAGS))
                     continue
                 cmd.extend([flag, str(params[param])])
 
@@ -210,9 +210,9 @@ def build_safe_command(
                 else:
                     flag = f'--{param.replace("_", "-")}'
                     if flag not in ALLOWED_FLAGS:
-                        logger.warning(f"Ignoring unallowed flag: {flag}")
+                        logger.warning("unknown_flag_rejected", flag=flag, allowed=list(ALLOWED_FLAGS))
                         continue
                     cmd.extend([flag, str(params[param])])
 
-    logger.info(f"Built safe command: {' '.join(cmd)}")
+    logger.info("command_built", script=script, arg_count=len(cmd)-1)
     return cmd

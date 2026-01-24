@@ -12,10 +12,10 @@ NOTE: This is for the API server only. Dashboard has separate CSP needs
 due to Dash inline scripts (requires csp_hashes()).
 """
 import os
-import logging
+import structlog
 from flask_talisman import Talisman
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def get_api_csp():
@@ -104,8 +104,8 @@ def configure_talisman(app, force_https: bool = None):
     )
 
     if force_https:
-        logger.info("Talisman configured with HTTPS enforcement")
+        logger.info("talisman_configured", force_https=True)
     else:
-        logger.info("Talisman configured without HTTPS enforcement (debug mode or proxy)")
+        logger.info("talisman_configured", force_https=False, reason="debug_mode_or_proxy")
 
     return talisman

@@ -8,11 +8,11 @@ Configure allowed origins via:
 3. Default: localhost only (development safe default)
 """
 import os
-import logging
+import structlog
 from flask_cors import CORS
 from typing import List
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 # Default origins for development only
 DEFAULT_ORIGINS = [
@@ -39,19 +39,20 @@ def get_cors_origins(config: dict = None) -> List[str]:
     env_origins = os.getenv('CORS_ALLOWED_ORIGINS', '').strip()
     if env_origins:
         origins = [o.strip() for o in env_origins.split(',') if o.strip()]
-        logger.info(f"CORS origins from environment: {origins}")
+        logger.info("cors_origins_from_environment", origins=origins)
         return origins
 
     # Check config file
     if config and 'server' in config and 'cors_origins' in config['server']:
         origins = config['server']['cors_origins']
         if origins and isinstance(origins, list):
-            logger.info(f"CORS origins from config: {origins}")
+            logger.info("cors_origins_from_config", origins=origins)
             return origins
 
     # Fall back to defaults (development only)
-    logger.warning("Using default CORS origins (localhost only). "
-                   "Set CORS_ALLOWED_ORIGINS env var for production.")
+    logger.warning("cors_using_defaults",
+                   message="Using default CORS origins (localhost only). "
+                           "Set CORS_ALLOWED_ORIGINS env var for production.")
     return DEFAULT_ORIGINS
 
 
@@ -72,7 +73,8 @@ def configure_cors(app, config: dict = None):
 
     # Validate no wildcards
     if '*' in origins:
-        logger.error("SECURITY: Wildcard (*) origin detected and removed from CORS config")
+        logger.error("cors_wildcard_detected_and_removed",
+                     message="SECURITY: Wildcard (*) origin detected and removed from CORS config")
         origins = [o for o in origins if o != '*']
         if not origins:
             origins = DEFAULT_ORIGINS
@@ -89,4 +91,4 @@ def configure_cors(app, config: dict = None):
     }
 
     CORS(app, resources=cors_config)
-    logger.info(f"CORS configured with {len(origins)} allowed origin(s)")
+    logger.info("cors_configured", origin_count=len(origins))
