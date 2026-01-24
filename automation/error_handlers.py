@@ -18,6 +18,7 @@ from werkzeug.exceptions import HTTPException
 
 from log_config.correlation import get_correlation_id
 from utils import utc_now_iso
+from exceptions import AirbaisAPIException
 
 logger = structlog.get_logger(__name__)
 
@@ -58,6 +59,34 @@ def build_error_response(
     return jsonify(response), status_code
 
 
+def handle_airbais_exception(e: AirbaisAPIException):
+    """
+    Handle custom Airbais API exceptions.
+
+    Logs the exception with full context and returns a structured error
+    response using the exception's error_code and status_code.
+
+    Args:
+        e: AirbaisAPIException or subclass
+
+    Returns:
+        Tuple of (jsonify response, status_code)
+    """
+    logger.error(
+        "airbais_api_error",
+        error_code=e.error_code,
+        status_code=e.status_code,
+        error=str(e),
+        exc_info=True
+    )
+    return build_error_response(
+        error=type(e).__name__,
+        message=e.message,
+        status_code=e.status_code,
+        error_code=e.error_code
+    )
+
+
 def handle_validation_error(e: ValidationError):
     """
     Handle Pydantic validation errors (400).
@@ -66,10 +95,13 @@ def handle_validation_error(e: ValidationError):
     internal file paths, making them safe to expose to clients.
     """
     logger.warning("validation_error", errors=e.errors())
-    return jsonify({
-        'error': 'Invalid request parameters',
-        'details': e.errors()
-    }), 400
+    return build_error_response(
+        error='Invalid request parameters',
+        message='Request validation failed',
+        status_code=400,
+        error_code='VALIDATION_ERROR',
+        details=e.errors()
+    )
 
 
 def handle_bad_request(e):
@@ -82,10 +114,12 @@ def handle_bad_request(e):
     if hasattr(e, 'description') and e.description:
         message = str(e.description)
     logger.warning("bad_request", message=message)
-    return jsonify({
-        'error': 'Bad request',
-        'message': message
-    }), 400
+    return build_error_response(
+        error='Bad request',
+        message=message,
+        status_code=400,
+        error_code='BAD_REQUEST'
+    )
 
 
 def handle_not_found(e):
@@ -94,10 +128,12 @@ def handle_not_found(e):
 
     No logging needed - 404s are expected behavior (e.g., unknown endpoints).
     """
-    return jsonify({
-        'error': 'Not found',
-        'message': 'The requested resource does not exist'
-    }), 404
+    return build_error_response(
+        error='Not found',
+        message='The requested resource does not exist',
+        status_code=404,
+        error_code='NOT_FOUND'
+    )
 
 
 def handle_internal_error(e):
@@ -110,10 +146,12 @@ def handle_internal_error(e):
     queries, configuration values, etc.
     """
     logger.error("internal_server_error", error=str(e), exc_info=True)
-    return jsonify({
-        'error': 'Internal server error',
-        'message': 'An unexpected error occurred. Please try again later.'
-    }), 500
+    return build_error_response(
+        error='Internal server error',
+        message='An unexpected error occurred. Please try again later.',
+        status_code=500,
+        error_code='INTERNAL_ERROR'
+    )
 
 
 def handle_unexpected_exception(e):
@@ -129,22 +167,25 @@ def handle_unexpected_exception(e):
         error=str(e),
         exc_info=True,
     )
-    return jsonify({
-        'error': 'Internal server error',
-        'message': 'An unexpected error occurred'
-    }), 500
+    return build_error_response(
+        error='Internal server error',
+        message='An unexpected error occurred',
+        status_code=500,
+        error_code='UNEXPECTED_ERROR'
+    )
 
 
 def register_error_handlers(app):
     """
     Register all error handlers with the Flask application.
 
-    Handler order matters: specific handlers (ValidationError) are checked
-    before generic ones (Exception). Flask processes them in registration order.
+    Handler order matters: specific handlers (ValidationError, AirbaisAPIException)
+    are checked before generic ones (Exception). Flask processes them in registration order.
 
     Args:
         app: Flask application instance
     """
+    app.register_error_handler(AirbaisAPIException, handle_airbais_exception)
     app.register_error_handler(ValidationError, handle_validation_error)
     app.register_error_handler(400, handle_bad_request)
     app.register_error_handler(404, handle_not_found)
