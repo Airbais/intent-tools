@@ -8,6 +8,7 @@ import subprocess
 import threading
 import uuid
 import re
+import time
 from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_pydantic import validate
@@ -15,6 +16,7 @@ from pydantic import ValidationError
 from collections import defaultdict
 import logging
 import traceback
+import structlog
 
 # Add parent directory to path to import tools
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -25,13 +27,11 @@ from security.cors_config import configure_cors
 from security.talisman_config import configure_talisman
 from security.subprocess_validator import build_safe_command, validate_tool_directory
 from validation.request_models import AnalyzeRequest, JobIdPath
+from log_config import configure_structlog, configure_correlation, configure_request_logging, get_logger, redact_sensitive, get_correlation_id
 
-# Configure logging first
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+# Configure structured logging first
+configure_structlog()
+logger = get_logger(__name__)
 
 # Load configuration
 def load_config():
@@ -51,6 +51,7 @@ SERVER_CONFIG = config.get('server', {})
 TIMEOUT_CONFIG = config.get('timeouts', {})
 
 app = Flask(__name__)
+configure_correlation(app)  # Must be first middleware
 register_error_handlers(app)
 configure_cors(app, config)
 configure_talisman(app)
