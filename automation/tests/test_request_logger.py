@@ -1,9 +1,12 @@
 """
 Tests for request/response logging middleware.
 """
+import sys
 import pytest
+import structlog
 from flask import Flask
 from automation.log_config import configure_request_logging, redact_sensitive
+from automation.log_config.structlog_config import configure_structlog
 
 
 class TestRedactSensitive:
@@ -86,6 +89,16 @@ class TestRedactSensitive:
 class TestRequestLoggingIntegration:
     """Integration tests for request logging middleware."""
 
+    @pytest.fixture(autouse=True)
+    def reset_structlog(self, monkeypatch):
+        """Reset and configure structlog for test capturing."""
+        structlog.reset_defaults()
+        # Force non-tty to get JSON output to stderr
+        monkeypatch.setattr(sys.stderr, 'isatty', lambda: False)
+        configure_structlog(debug=False)
+        yield
+        structlog.reset_defaults()
+
     @pytest.fixture
     def app(self):
         """Create test Flask app with request logging."""
@@ -108,54 +121,64 @@ class TestRequestLoggingIntegration:
         """Create test client."""
         return app.test_client()
 
-    def test_logs_get_request(self, client, capsys):
+    def test_logs_get_request(self, client, caplog):
         """Test that GET request is logged."""
-        response = client.get('/test')
+        with caplog.at_level('INFO'):
+            response = client.get('/test')
         assert response.status_code == 200
 
-        # Check that request start and completion are logged (structlog outputs to stdout)
-        captured = capsys.readouterr()
-        assert 'api_request_started' in captured.out
-        assert 'api_request_completed' in captured.out
-        assert 'GET' in captured.out
-        assert '/test' in captured.out
+        # Check that request start and completion are logged via caplog records
+        log_messages = [r.message for r in caplog.records]
+        log_output = ' '.join(log_messages)
+        assert 'api_request_started' in log_output
+        assert 'api_request_completed' in log_output
+        assert 'GET' in log_output
+        assert '/test' in log_output
 
-    def test_logs_post_request(self, client, capsys):
+    def test_logs_post_request(self, client, caplog):
         """Test that POST request is logged."""
-        response = client.post('/test', json={'key': 'value'})
+        with caplog.at_level('INFO'):
+            response = client.post('/test', json={'key': 'value'})
         assert response.status_code == 200
 
-        captured = capsys.readouterr()
-        assert 'api_request_started' in captured.out
-        assert 'api_request_completed' in captured.out
-        assert 'POST' in captured.out
+        log_messages = [r.message for r in caplog.records]
+        log_output = ' '.join(log_messages)
+        assert 'api_request_started' in log_output
+        assert 'api_request_completed' in log_output
+        assert 'POST' in log_output
 
-    def test_logs_status_code(self, client, capsys):
+    def test_logs_status_code(self, client, caplog):
         """Test that status code is logged."""
-        response = client.get('/error')
+        with caplog.at_level('INFO'):
+            response = client.get('/error')
         assert response.status_code == 404
 
-        captured = capsys.readouterr()
-        assert 'api_request_completed' in captured.out
-        assert '404' in captured.out
+        log_messages = [r.message for r in caplog.records]
+        log_output = ' '.join(log_messages)
+        assert 'api_request_completed' in log_output
+        assert '404' in log_output
 
-    def test_logs_duration(self, client, capsys):
+    def test_logs_duration(self, client, caplog):
         """Test that duration is logged."""
-        response = client.get('/test')
+        with caplog.at_level('INFO'):
+            response = client.get('/test')
         assert response.status_code == 200
 
-        captured = capsys.readouterr()
-        assert 'api_request_completed' in captured.out
-        assert 'duration_ms' in captured.out
+        log_messages = [r.message for r in caplog.records]
+        log_output = ' '.join(log_messages)
+        assert 'api_request_completed' in log_output
+        assert 'duration_ms' in log_output
 
-    def test_redacts_sensitive_query_params(self, client, capsys):
+    def test_redacts_sensitive_query_params(self, client, caplog):
         """Test that sensitive query params are redacted in logs."""
-        response = client.get('/test?api_key=secret123&url=example.com')
+        with caplog.at_level('INFO'):
+            response = client.get('/test?api_key=secret123&url=example.com')
         assert response.status_code == 200
 
-        captured = capsys.readouterr()
+        log_messages = [r.message for r in caplog.records]
+        log_output = ' '.join(log_messages)
         # Check logs don't contain the actual API key
-        assert 'secret123' not in captured.out
-        assert '[REDACTED]' in captured.out
-        assert 'url' in captured.out
-        assert 'example.com' in captured.out
+        assert 'secret123' not in log_output
+        assert '[REDACTED]' in log_output
+        assert 'url' in log_output
+        assert 'example.com' in log_output
