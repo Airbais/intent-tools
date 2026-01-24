@@ -258,10 +258,7 @@ def health_check():
 def analyze(tool_name, body: AnalyzeRequest):
     """Start analysis for a specific tool"""
     if tool_name not in TOOL_CONFIGS:
-        return jsonify({
-            'error': f'Unknown tool: {tool_name}',
-            'available_tools': list(TOOL_CONFIGS.keys())
-        }), 404
+        raise ToolNotFoundError(tool_name)
 
     try:
         # Convert Pydantic model to dict, excluding None values
