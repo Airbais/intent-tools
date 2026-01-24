@@ -94,12 +94,24 @@ def get_job(job_id):
 
 def run_tool_async(job_id, tool_name, params):
     """Run tool in background thread"""
+    start_time = time.time()
+
+    # Bind job context for structured logging
+    structlog.contextvars.bind_contextvars(job_id=job_id, tool_name=tool_name)
+    tool_logger = structlog.get_logger(__name__)
+
     try:
         update_job(job_id, {'status': 'running'})
 
         tool_config = TOOL_CONFIGS.get(tool_name)
         if not tool_config:
             raise ValueError(f"Unknown tool: {tool_name}")
+
+        # Log tool execution started with redacted params
+        tool_logger.info(
+            "tool_execution_started",
+            parameters=redact_sensitive(params)
+        )
 
         # Build paths
         tools_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -119,7 +131,18 @@ def run_tool_async(job_id, tool_name, params):
         if cmd is None:
             raise ValueError("Command validation failed - check logs for details")
 
-        logger.info(f"Running validated command: {' '.join(cmd)} in directory: {tool_dir}")
+        tool_logger.info(
+            "tool_subprocess_starting",
+            command=cmd[0],
+            args_count=len(cmd) - 1,
+            working_directory=tool_dir
+        )
+
+        # Prepare environment with correlation ID for subprocess
+        env = os.environ.copy()
+        correlation_id = get_correlation_id()
+        if correlation_id:
+            env['CORRELATION_ID'] = correlation_id
 
         # Run with shell=False (default, list args prevent injection)
         process = subprocess.Popen(
@@ -127,7 +150,8 @@ def run_tool_async(job_id, tool_name, params):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
-            cwd=tool_dir
+            cwd=tool_dir,
+            env=env
         )
         
         # Capture output
@@ -179,16 +203,29 @@ def run_tool_async(job_id, tool_name, params):
                             }
                     except:
                         pass
-        
+
+        duration = time.time() - start_time
+
+        tool_logger.info(
+            "tool_execution_completed",
+            results_dir=results_dir,
+            duration_seconds=round(duration, 2)
+        )
+
         update_job(job_id, {
             'status': 'completed',
             'completed_at': datetime.now().isoformat(),
             'results': results
         })
-        
+
     except Exception as e:
-        logger.error(f"Job {job_id} failed: {str(e)}")
-        logger.error(traceback.format_exc())
+        duration = time.time() - start_time
+        tool_logger.error(
+            "tool_execution_failed",
+            error=str(e),
+            duration_seconds=round(duration, 2),
+            exc_info=True
+        )
         update_job(job_id, {
             'status': 'failed',
             'error': 'Tool execution failed. Check server logs for details.',
