@@ -28,6 +28,13 @@ from security.talisman_config import configure_talisman
 from security.subprocess_validator import build_safe_command, validate_tool_directory
 from validation.request_models import AnalyzeRequest, JobIdPath
 from log_config import configure_structlog, configure_correlation, configure_request_logging, get_logger, redact_sensitive, get_correlation_id
+from exceptions import (
+    ToolNotFoundError,
+    ToolExecutionError,
+    JobNotFoundError,
+    ConfigurationError
+)
+from utils import utc_now_iso
 
 # Configure structured logging first
 configure_structlog()
@@ -40,8 +47,8 @@ def load_config():
     try:
         with open(config_path, 'r') as f:
             return yaml.safe_load(f)
-    except Exception as e:
-        logger.error("config_load_failed", config_path=config_path, error=str(e))
+    except (yaml.YAMLError, IOError) as e:
+        logger.error("config_load_failed", config_path=config_path, error=str(e), exc_info=True)
         return {'tools': {}, 'server': {'port': 8888, 'host': '0.0.0.0'}}
 
 # Load configuration
@@ -69,8 +76,8 @@ def create_job(tool_name):
             'id': job_id,
             'tool': tool_name,
             'status': 'queued',
-            'created_at': datetime.now().isoformat(),
-            'updated_at': datetime.now().isoformat(),
+            'created_at': utc_now_iso(),
+            'updated_at': utc_now_iso(),
             'completed_at': None,
             'error': None,
             'results': None,
@@ -84,7 +91,7 @@ def update_job(job_id, updates):
     with job_lock:
         if job_id in jobs:
             jobs[job_id].update(updates)
-            jobs[job_id]['updated_at'] = datetime.now().isoformat()
+            jobs[job_id]['updated_at'] = utc_now_iso()
 
 def get_job(job_id):
     """Get job details"""
@@ -104,7 +111,7 @@ def run_tool_async(job_id, tool_name, params):
 
         tool_config = TOOL_CONFIGS.get(tool_name)
         if not tool_config:
-            raise ValueError(f"Unknown tool: {tool_name}")
+            raise ToolNotFoundError(tool_name)
 
         # Log tool execution started with redacted params
         tool_logger.info(
@@ -128,7 +135,7 @@ def run_tool_async(job_id, tool_name, params):
         )
 
         if cmd is None:
-            raise ValueError("Command validation failed - check logs for details")
+            raise ConfigurationError("Command validation failed - check logs for details")
 
         tool_logger.info(
             "tool_subprocess_starting",
@@ -157,7 +164,7 @@ def run_tool_async(job_id, tool_name, params):
         stdout, stderr = process.communicate()
         
         if process.returncode != 0:
-            raise Exception(f"Tool execution failed: {stderr}")
+            raise ToolExecutionError(tool_name, f"Process returned exit code {process.returncode}: {stderr}")
         
         # Parse output to find results directory
         results_dir = None
@@ -175,7 +182,7 @@ def run_tool_async(job_id, tool_name, params):
                     results_dir = os.path.join(base_dir, dirs[0])
         
         if not results_dir or not os.path.exists(results_dir):
-            raise Exception("Could not find results directory")
+            raise ToolExecutionError(tool_name, "Could not find results directory after tool execution")
         
         # Collect results
         results = {
@@ -200,8 +207,13 @@ def run_tool_async(job_id, tool_name, params):
                                 'intents_discovered': data.get('total_intents', 0),
                                 'processing_time_seconds': None  # Would need to track this
                             }
-                    except:
-                        pass
+                    except (json.JSONDecodeError, KeyError, IOError) as e:
+                        tool_logger.debug(
+                            "dashboard_metrics_parse_failed",
+                            file_path=file_path,
+                            error=str(e),
+                            exc_info=True
+                        )
 
         duration = time.time() - start_time
 
@@ -213,7 +225,7 @@ def run_tool_async(job_id, tool_name, params):
 
         update_job(job_id, {
             'status': 'completed',
-            'completed_at': datetime.now().isoformat(),
+            'completed_at': utc_now_iso(),
             'results': results
         })
 
@@ -228,7 +240,7 @@ def run_tool_async(job_id, tool_name, params):
         update_job(job_id, {
             'status': 'failed',
             'error': 'Tool execution failed. Check server logs for details.',
-            'completed_at': datetime.now().isoformat()
+            'completed_at': utc_now_iso()
         })
 
 @app.route('/health', methods=['GET'])
@@ -236,7 +248,7 @@ def health_check():
     """Health check endpoint"""
     return jsonify({
         'status': 'healthy',
-        'timestamp': datetime.now().isoformat(),
+        'timestamp': utc_now_iso(),
         'tools': list(TOOL_CONFIGS.keys()),
         'active_jobs': len(jobs)
     })
