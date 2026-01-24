@@ -41,7 +41,7 @@ def load_config():
         with open(config_path, 'r') as f:
             return yaml.safe_load(f)
     except Exception as e:
-        logger.error(f"Failed to load config: {e}")
+        logger.error("config_load_failed", config_path=config_path, error=str(e))
         return {'tools': {}, 'server': {'port': 8888, 'host': '0.0.0.0'}}
 
 # Load configuration
@@ -76,8 +76,7 @@ def create_job(tool_name):
             'results': None,
             'logs': []
         }
-    logger.info(f"Created job {job_id} for tool {tool_name}")
-    logger.debug(f"Current jobs: {list(jobs.keys())}")
+    logger.info("job_created", job_id=job_id, tool_name=tool_name)
     return job_id
 
 def update_job(job_id, updates):
@@ -270,10 +269,9 @@ def analyze(tool_name, body: AnalyzeRequest):
         job_id = create_job(tool_name)
         
         # Verify job was created
-        logger.info(f"Created job {job_id}, verifying...")
         test_job = get_job(job_id)
         if not test_job:
-            logger.error(f"Job {job_id} not found immediately after creation!")
+            logger.error("job_creation_verification_failed", job_id=job_id)
             return jsonify({'error': 'Failed to create job'}), 500
         
         # Start analysis in background
@@ -291,7 +289,7 @@ def analyze(tool_name, body: AnalyzeRequest):
         }), 202
 
     except Exception as e:
-        logger.error(f"Error starting analysis: {str(e)}", exc_info=True)
+        logger.error("analyze_start_failed", error=str(e), exc_info=True)
         return jsonify({
             'error': 'Failed to start analysis',
             'message': 'Please check server logs for details'
@@ -306,12 +304,11 @@ def get_status(job_id):
     except ValidationError as e:
         return jsonify({'error': 'Invalid job ID format', 'details': e.errors()}), 400
 
-    logger.info(f"Status request for job: {validated.job_id}")
-    logger.debug(f"Available jobs: {list(jobs.keys())}")
+    logger.debug("job_status_requested", job_id=validated.job_id)
 
     job = get_job(validated.job_id)
     if not job:
-        logger.warning(f"Job {validated.job_id} not found in {len(jobs)} jobs")
+        logger.info("job_not_found", requested_job_id=validated.job_id, total_jobs=len(jobs))
         return jsonify({
             'error': 'Job not found',
             'job_id': validated.job_id
@@ -374,8 +371,13 @@ if __name__ == '__main__':
     port = SERVER_CONFIG.get('port', 8888)
     host = SERVER_CONFIG.get('host', '0.0.0.0')
     debug = SERVER_CONFIG.get('debug', False)
-    
-    logger.info(f"Starting Airbais Tools Automation API on {host}:{port}")
-    logger.info(f"Available tools: {', '.join(TOOL_CONFIGS.keys())}")
-    
+
+    logger.info(
+        "api_server_starting",
+        host=host,
+        port=port,
+        debug=debug,
+        available_tools=list(TOOL_CONFIGS.keys())
+    )
+
     app.run(host=host, port=port, debug=debug)
