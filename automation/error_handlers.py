@@ -11,12 +11,12 @@ Security objectives:
 - All exceptions are logged with full traceback (exc_info=True) before sanitizing response
 """
 
-import logging
+import structlog
 from flask import jsonify
 from pydantic import ValidationError
 from werkzeug.exceptions import HTTPException
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def handle_validation_error(e: ValidationError):
@@ -26,7 +26,7 @@ def handle_validation_error(e: ValidationError):
     Pydantic v2 errors contain field names and validation messages but no
     internal file paths, making them safe to expose to clients.
     """
-    logger.warning(f"Validation error: {e.errors()}")
+    logger.warning("validation_error", errors=e.errors())
     return jsonify({
         'error': 'Invalid request parameters',
         'details': e.errors()
@@ -39,10 +39,10 @@ def handle_bad_request(e):
 
     Returns structured error with safe description if available.
     """
-    logger.warning(f"Bad request: {e}")
     message = 'Invalid request'
     if hasattr(e, 'description') and e.description:
         message = str(e.description)
+    logger.warning("bad_request", message=message)
     return jsonify({
         'error': 'Bad request',
         'message': message
@@ -70,7 +70,7 @@ def handle_internal_error(e):
     This prevents leaking sensitive information like file paths, database
     queries, configuration values, etc.
     """
-    logger.error(f"Internal server error: {str(e)}", exc_info=True)
+    logger.error("internal_server_error", error=str(e), exc_info=True)
     return jsonify({
         'error': 'Internal server error',
         'message': 'An unexpected error occurred. Please try again later.'
@@ -84,7 +84,12 @@ def handle_unexpected_exception(e):
     Logs at CRITICAL level since unhandled exceptions indicate bugs or
     unexpected conditions. Full traceback logged via exc_info=True.
     """
-    logger.critical(f"Unhandled exception: {type(e).__name__}: {str(e)}", exc_info=True)
+    logger.critical(
+        "unhandled_exception",
+        error_type=type(e).__name__,
+        error=str(e),
+        exc_info=True,
+    )
     return jsonify({
         'error': 'Internal server error',
         'message': 'An unexpected error occurred'
@@ -106,4 +111,4 @@ def register_error_handlers(app):
     app.register_error_handler(404, handle_not_found)
     app.register_error_handler(500, handle_internal_error)
     app.register_error_handler(Exception, handle_unexpected_exception)
-    logger.info("Error handlers registered")
+    logger.info("error_handlers_registered")
