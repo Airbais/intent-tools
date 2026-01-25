@@ -12,4 +12,4 @@ rulesevaluator/PROJECT_PLAN.md
 rules/airbais_rules.json
 .github/
 # GSD planning docs (local only)
-.planning/
+#.planning/
