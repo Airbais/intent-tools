@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "updated": 1737433200000,
+  "naming": {
+    "exports": {
+      "dominant": "PascalCase",
+      "count": 68,
+      "percentage": 75,
+      "patterns": {
+        "PascalCase": {
+          "count": 51,
+          "examples": ["WebCrawler", "ContentProcessor", "GEOAnalysisPipeline", "RulesEvaluator", "MasterDashboard"]
+        },
+        "snake_case": {
+          "count": 17,
+          "examples": ["setup_logging", "load_config", "main", "run_generator", "get_latest_results_directory"]
+        }
+      }
+    },
+    "files": {
+      "dominant": "snake_case",
+      "count": 78,
+      "percentage": 100,
+      "examples": ["api_server.py", "content_processor.py", "config_manager.py", "data_loader.py", "scoring_engine.py"]
+    }
+  },
+  "directories": {
+    "src": {
+      "purpose": "Core source modules for each tool",
+      "files": 35,
+      "tools": ["intentcrawler", "llmevaluator", "geoevaluator", "graspevaluator", "llmstxtgenerator", "rulesevaluator"]
+    },
+    "metrics": {
+      "purpose": "GRASP metric implementations",
+      "files": 5,
+      "tools": ["graspevaluator"]
+    },
+    "utils": {
+      "purpose": "Utility functions and helpers",
+      "files": 3,
+      "tools": ["graspevaluator", "geoevaluator"]
+    },
+    "assets": {
+      "purpose": "Frontend assets (JS/CSS)",
+      "files": 2,
+      "tools": ["dashboard", "intentcrawler"]
+    },
+    "tests": {
+      "purpose": "Test files",
+      "files": 5,
+      "tools": ["rulesevaluator"]
+    },
+    "archive": {
+      "purpose": "Archived/legacy files",
+      "files": 4,
+      "tools": ["intentcrawler"]
+    },
+    "automation": {
+      "purpose": "REST API server for tool orchestration",
+      "files": 6
+    },
+    "dashboard": {
+      "purpose": "Unified visualization interface",
+      "files": 4
+    }
+  },
+  "suffixes": {
+    "_evaluator.py": {
+      "purpose": "Main evaluation entry points",
+      "count": 5,
+      "examples": ["graspevaluator.py", "geoevaluator.py", "llmevaluator.py", "rulesevaluator.py"]
+    },
+    "_manager.py": {
+      "purpose": "Configuration and resource managers",
+      "count": 5,
+      "examples": ["config_manager.py"]
+    },
+    "_generator.py": {
+      "purpose": "Report and output generators",
+      "count": 3,
+      "examples": ["report_generator.py", "output_generator.py"]
+    },
+    "_extractor.py": {
+      "purpose": "Content/intent extractors",
+      "count": 4,
+      "examples": ["intent_extractor.py", "user_intent_extractor.py", "content_extractor.py"]
+    },
+    "_crawler.py": {
+      "purpose": "Web crawling modules",
+      "count": 4,
+      "examples": ["crawler.py", "website_crawler.py"]
+    },
+    "_loader.py": {
+      "purpose": "Data loading utilities",
+      "count": 1,
+      "examples": ["data_loader.py"]
+    },
+    "_server.py": {
+      "purpose": "API server implementations",
+      "count": 1,
+      "examples": ["api_server.py"]
+    },
+    "test_*.py": {
+      "purpose": "Test files",
+      "count": 9,
+      "examples": ["test_api.py", "test_integration.py", "test_rules_validator.py"]
+    }
+  },
+  "architecture": {
+    "pattern": "modular_tools",
+    "description": "Each tool is self-contained with its own entry point, src/, and results/ directories",
+    "shared_components": {
+      "dashboard": "Unified visualization for all tools",
+      "automation": "REST API for tool orchestration"
+    },
+    "output_format": "dashboard-data.json in results/YYYY-MM-DD/ directories"
+  }
+}

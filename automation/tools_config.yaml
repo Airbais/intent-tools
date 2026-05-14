@@ -80,12 +80,43 @@ tools:
       - "verbose"
     param_style: "flags"  # All parameters use flags
 
+  rulesevaluator:
+    name: "Rules Evaluator"
+    module_path: "rulesevaluator"
+    script: "rulesevaluator.py"
+    description: "Evaluate AI responses against user-defined rules using RAG technology"
+    result_files:
+      - "dashboard-data.json"
+      - "evaluation_results.json"
+      - "evaluation_summary.md"
+      - "evaluation_report.html"
+      - "ai_responses.log"
+    required_params:
+      - "rules_file"
+    optional_params:
+      - "config" 
+      - "content_source"
+      - "output"
+      - "log_level"
+      - "no_cache"
+      - "dry_run"
+    param_style: "positional"  # Rules file is positional argument
+
 # API Server Configuration
 server:
   port: 8888
   host: "0.0.0.0"
   debug: false
-  cors_enabled: true
+  # CORS configuration - explicit whitelist, no wildcards
+  # Override with CORS_ALLOWED_ORIGINS env var in production
+  cors_origins:
+    - "http://localhost:3000"
+    - "http://localhost:8050"
+    - "http://127.0.0.1:3000"
+    - "http://127.0.0.1:8050"
+    # Add production origins here:
+    # - "https://app.yourdomain.com"
+    # - "https://dashboard.yourdomain.com"
   max_jobs_in_memory: 1000
   job_cleanup_after_hours: 24
 
@@ -97,3 +128,4 @@ timeouts:
   geoevaluator: 900  # 15 minutes for comprehensive GEO analysis
   llmevaluator: 1200  # 20 minutes for multi-LLM evaluation
   llmstxt_generator: 300
+  rulesevaluator: 900  # 15 minutes for RAG database and evaluation

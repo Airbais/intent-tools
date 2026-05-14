@@ -1,0 +1,46 @@
+{
+  "prompts": [
+    {
+      "prompt": "Explain our return policy",
+      "rules": [
+        {
+          "ruletype": "critical",
+          "ruledescription": "Must mention the 30-day return window"
+        },
+        {
+          "ruletype": "important",
+          "ruledescription": "Should explain the refund process and timeline"
+        },
+        {
+          "ruletype": "expected",
+          "ruledescription": "Should mention condition requirements for returns"
+        },
+        {
+          "ruletype": "desirable",
+          "ruledescription": "Include customer service contact information"
+        }
+      ]
+    },
+    {
+      "prompt": "What are the key features of our premium subscription?",
+      "rules": [
+        {
+          "ruletype": "critical",
+          "ruledescription": "Must list at least 3 core premium features"
+        },
+        {
+          "ruletype": "important",
+          "ruledescription": "Should mention the pricing or value proposition"
+        },
+        {
+          "ruletype": "expected",
+          "ruledescription": "Should differentiate from free tier"
+        },
+        {
+          "ruletype": "desirable",
+          "ruledescription": "Include information about trial period or guarantees"
+        }
+      ]
+    }
+  ]
+}

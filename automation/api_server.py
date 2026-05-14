@@ -8,22 +8,37 @@ import subprocess
 import threading
 import uuid
 import re
+import time
 from datetime import datetime
 from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask_pydantic import validate
+from pydantic import ValidationError
 from collections import defaultdict
 import logging
 import traceback
+import structlog
 
 # Add parent directory to path to import tools
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Configure logging first
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+# Import error handlers and security config
+from error_handlers import register_error_handlers
+from security.cors_config import configure_cors
+from security.talisman_config import configure_talisman
+from security.subprocess_validator import build_safe_command, validate_tool_directory
+from validation.request_models import AnalyzeRequest, JobIdPath
+from log_config import configure_structlog, configure_correlation, configure_request_logging, get_logger, redact_sensitive, get_correlation_id
+from exceptions import (
+    ToolNotFoundError,
+    ToolExecutionError,
+    JobNotFoundError,
+    ConfigurationError
 )
-logger = logging.getLogger(__name__)
+from utils import utc_now_iso
+
+# Configure structured logging first
+configure_structlog()
+logger = get_logger(__name__)
 
 # Load configuration
 def load_config():
@@ -32,8 +47,8 @@ def load_config():
     try:
         with open(config_path, 'r') as f:
             return yaml.safe_load(f)
-    except Exception as e:
-        logger.error(f"Failed to load config: {e}")
+    except (yaml.YAMLError, IOError) as e:
+        logger.error("config_load_failed", config_path=config_path, error=str(e), exc_info=True)
         return {'tools': {}, 'server': {'port': 8888, 'host': '0.0.0.0'}}
 
 # Load configuration
@@ -43,8 +58,11 @@ SERVER_CONFIG = config.get('server', {})
 TIMEOUT_CONFIG = config.get('timeouts', {})
 
 app = Flask(__name__)
-if SERVER_CONFIG.get('cors_enabled', True):
-    CORS(app)  # Enable CORS for N8N
+configure_correlation(app)  # Must be first middleware
+configure_request_logging(app)  # Log all requests/responses with timing
+register_error_handlers(app)
+configure_cors(app, config)
+configure_talisman(app)
 
 # Job storage (in production, use Redis or database)
 jobs = {}  # Changed from defaultdict(dict) to regular dict
@@ -58,15 +76,14 @@ def create_job(tool_name):
             'id': job_id,
             'tool': tool_name,
             'status': 'queued',
-            'created_at': datetime.now().isoformat(),
-            'updated_at': datetime.now().isoformat(),
+            'created_at': utc_now_iso(),
+            'updated_at': utc_now_iso(),
             'completed_at': None,
             'error': None,
             'results': None,
             'logs': []
         }
-    logger.info(f"Created job {job_id} for tool {tool_name}")
-    logger.debug(f"Current jobs: {list(jobs.keys())}")
+    logger.info("job_created", job_id=job_id, tool_name=tool_name)
     return job_id
 
 def update_job(job_id, updates):
@@ -74,7 +91,7 @@ def update_job(job_id, updates):
     with job_lock:
         if job_id in jobs:
             jobs[job_id].update(updates)
-            jobs[job_id]['updated_at'] = datetime.now().isoformat()
+            jobs[job_id]['updated_at'] = utc_now_iso()
 
 def get_job(job_id):
     """Get job details"""
@@ -83,79 +100,71 @@ def get_job(job_id):
 
 def run_tool_async(job_id, tool_name, params):
     """Run tool in background thread"""
+    start_time = time.time()
+
+    # Bind job context for structured logging
+    structlog.contextvars.bind_contextvars(job_id=job_id, tool_name=tool_name)
+    tool_logger = structlog.get_logger(__name__)
+
     try:
         update_job(job_id, {'status': 'running'})
-        
+
         tool_config = TOOL_CONFIGS.get(tool_name)
         if not tool_config:
-            raise ValueError(f"Unknown tool: {tool_name}")
-        
+            raise ToolNotFoundError(tool_name)
+
+        # Log tool execution started with redacted params
+        tool_logger.info(
+            "tool_execution_started",
+            parameters=redact_sensitive(params)
+        )
+
         # Build paths
         tools_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         tool_dir = os.path.join(tools_dir, tool_config['module_path'])
         tool_script = tool_config['script']
-        
-        # Use relative script name and run from tool's directory
-        cmd = ['python3', tool_script]
-        
-        # Add tool-specific parameters based on config
-        tool_params = tool_config.get('required_params', []) + tool_config.get('optional_params', [])
-        param_style = tool_config.get('param_style', 'flags')  # Default to flags style
-        
-        # Handle parameters based on style
-        if param_style == 'positional':
-            # URL is a positional argument (like intentcrawler)
-            if 'url' in params:
-                cmd.append(params['url'])
-            # Handle optional parameters with -- prefix
-            for param in tool_config.get('optional_params', []):
-                if param in params:
-                    cmd.extend([f'--{param.replace("_", "-")}', str(params[param])])
-        elif param_style == 'config_file':
-            # Config file is a positional argument (like llmevaluator)
-            if 'config' in params:
-                cmd.append(params['config'])
-            # Handle optional parameters with -- prefix
-            for param in tool_config.get('optional_params', []):
-                if param in params:
-                    # Special handling for boolean flags
-                    if param in ['no_cache', 'clear_cache', 'dry_run', 'dashboard']:
-                        if params[param]:  # Only add flag if True
-                            cmd.append(f'--{param.replace("_", "-")}')
-                    else:
-                        cmd.extend([f'--{param.replace("_", "-")}', str(params[param])])
-        else:
-            # All parameters use flags (default style)
-            # Handle required parameters
-            for param in tool_config.get('required_params', []):
-                if param in params:
-                    cmd.extend([f'--{param.replace("_", "-")}', str(params[param])])
-            
-            # Handle optional parameters
-            for param in tool_config.get('optional_params', []):
-                if param in params:
-                    # Special handling for output directory parameter
-                    if param == 'output' and tool_name == 'geoevaluator':
-                        cmd.extend(['--output-dir', str(params[param])])
-                    else:
-                        cmd.extend([f'--{param.replace("_", "-")}', str(params[param])])
-        
-        logger.info(f"Running command: {' '.join(cmd)} in directory: {tool_dir}")
-        
-        # Run the tool in its own directory
+        param_style = tool_config.get('param_style', 'flags')
+
+        # SECURITY: Build validated command
+        cmd = build_safe_command(
+            script=tool_script,
+            params=params,
+            tool_dir=tool_dir,
+            tool_config=tool_config,
+            param_style=param_style
+        )
+
+        if cmd is None:
+            raise ConfigurationError("Command validation failed - check logs for details")
+
+        tool_logger.info(
+            "tool_subprocess_starting",
+            command=cmd[0],
+            args_count=len(cmd) - 1,
+            working_directory=tool_dir
+        )
+
+        # Prepare environment with correlation ID for subprocess
+        env = os.environ.copy()
+        correlation_id = get_correlation_id()
+        if correlation_id:
+            env['CORRELATION_ID'] = correlation_id
+
+        # Run with shell=False (default, list args prevent injection)
         process = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
-            cwd=tool_dir
+            cwd=tool_dir,
+            env=env
         )
         
         # Capture output
         stdout, stderr = process.communicate()
         
         if process.returncode != 0:
-            raise Exception(f"Tool execution failed: {stderr}")
+            raise ToolExecutionError(tool_name, f"Process returned exit code {process.returncode}: {stderr}")
         
         # Parse output to find results directory
         results_dir = None
@@ -173,7 +182,7 @@ def run_tool_async(job_id, tool_name, params):
                     results_dir = os.path.join(base_dir, dirs[0])
         
         if not results_dir or not os.path.exists(results_dir):
-            raise Exception("Could not find results directory")
+            raise ToolExecutionError(tool_name, "Could not find results directory after tool execution")
         
         # Collect results
         results = {
@@ -198,22 +207,40 @@ def run_tool_async(job_id, tool_name, params):
                                 'intents_discovered': data.get('total_intents', 0),
                                 'processing_time_seconds': None  # Would need to track this
                             }
-                    except:
-                        pass
-        
+                    except (json.JSONDecodeError, KeyError, IOError) as e:
+                        tool_logger.debug(
+                            "dashboard_metrics_parse_failed",
+                            file_path=file_path,
+                            error=str(e),
+                            exc_info=True
+                        )
+
+        duration = time.time() - start_time
+
+        tool_logger.info(
+            "tool_execution_completed",
+            results_dir=results_dir,
+            duration_seconds=round(duration, 2)
+        )
+
         update_job(job_id, {
             'status': 'completed',
-            'completed_at': datetime.now().isoformat(),
+            'completed_at': utc_now_iso(),
             'results': results
         })
-        
+
     except Exception as e:
-        logger.error(f"Job {job_id} failed: {str(e)}")
-        logger.error(traceback.format_exc())
+        duration = time.time() - start_time
+        tool_logger.error(
+            "tool_execution_failed",
+            error=str(e),
+            duration_seconds=round(duration, 2),
+            exc_info=True
+        )
         update_job(job_id, {
             'status': 'failed',
-            'error': str(e),
-            'completed_at': datetime.now().isoformat()
+            'error': 'Tool execution failed. Check server logs for details.',
+            'completed_at': utc_now_iso()
         })
 
 @app.route('/health', methods=['GET'])
@@ -221,23 +248,22 @@ def health_check():
     """Health check endpoint"""
     return jsonify({
         'status': 'healthy',
-        'timestamp': datetime.now().isoformat(),
+        'timestamp': utc_now_iso(),
         'tools': list(TOOL_CONFIGS.keys()),
         'active_jobs': len(jobs)
     })
 
 @app.route('/<tool_name>/analyze', methods=['POST'])
-def analyze(tool_name):
+@validate()
+def analyze(tool_name, body: AnalyzeRequest):
     """Start analysis for a specific tool"""
     if tool_name not in TOOL_CONFIGS:
-        return jsonify({
-            'error': f'Unknown tool: {tool_name}',
-            'available_tools': list(TOOL_CONFIGS.keys())
-        }), 404
-    
+        raise ToolNotFoundError(tool_name)
+
     try:
-        params = request.get_json() or {}
-        
+        # Convert Pydantic model to dict, excluding None values
+        params = body.model_dump(exclude_none=True)
+
         # Validate required parameters based on config
         required_params = TOOL_CONFIGS[tool_name].get('required_params', [])
         missing_params = [p for p in required_params if p not in params]
@@ -247,15 +273,14 @@ def analyze(tool_name):
                 'required': required_params,
                 'optional': TOOL_CONFIGS[tool_name].get('optional_params', [])
             }), 400
-        
+
         # Create job
         job_id = create_job(tool_name)
         
         # Verify job was created
-        logger.info(f"Created job {job_id}, verifying...")
         test_job = get_job(job_id)
         if not test_job:
-            logger.error(f"Job {job_id} not found immediately after creation!")
+            logger.error("job_creation_verification_failed", job_id=job_id)
             return jsonify({'error': 'Failed to create job'}), 500
         
         # Start analysis in background
@@ -271,33 +296,31 @@ def analyze(tool_name):
             'status': 'queued',
             'message': f'{TOOL_CONFIGS[tool_name]["name"]} analysis started'
         }), 202
-        
+
     except Exception as e:
-        logger.error(f"Error starting analysis: {str(e)}")
-        return jsonify({'error': 'Failed to start analysis'}), 500
+        logger.error("analyze_start_failed", error=str(e), exc_info=True)
+        return jsonify({
+            'error': 'Failed to start analysis',
+            'message': 'Please check server logs for details'
+        }), 500
 
 @app.route('/status/<job_id>', methods=['GET'])
 def get_status(job_id):
     """Get job status"""
-    # Clean up job_id - remove any trailing special characters
-    original_id = job_id
-    # Remove any non-alphanumeric characters from the end (except hyphens)
-    job_id = re.sub(r'[^a-zA-Z0-9\-]+$', '', job_id).strip()
-    
-    if original_id != job_id:
-        logger.info(f"Cleaned job_id from '{original_id}' to '{job_id}'")
-    
-    logger.info(f"Status request for job: {job_id}")
-    logger.debug(f"Available jobs: {list(jobs.keys())}")
-    
-    job = get_job(job_id)
+    # Validate path parameter using Pydantic model
+    try:
+        validated = JobIdPath(job_id=job_id)
+    except ValidationError as e:
+        return jsonify({'error': 'Invalid job ID format', 'details': e.errors()}), 400
+
+    logger.debug("job_status_requested", job_id=validated.job_id)
+
+    job = get_job(validated.job_id)
     if not job:
-        logger.warning(f"Job {job_id} not found in {len(jobs)} jobs")
+        logger.info("job_not_found", requested_job_id=validated.job_id, total_jobs=len(jobs))
         return jsonify({
             'error': 'Job not found',
-            'requested_id': original_id,
-            'cleaned_id': job_id,
-            'available_jobs': list(jobs.keys())
+            'job_id': validated.job_id
         }), 404
     
     response = {
@@ -317,16 +340,15 @@ def get_status(job_id):
 @app.route('/results/<job_id>', methods=['GET'])
 def get_results(job_id):
     """Get job results"""
-    # Clean up job_id - remove any trailing special characters
-    original_id = job_id
-    job_id = re.sub(r'[^a-zA-Z0-9\-]+$', '', job_id).strip()
-    
-    if original_id != job_id:
-        logger.info(f"Cleaned job_id from '{original_id}' to '{job_id}'")
-    
-    job = get_job(job_id)
+    # Validate path parameter using Pydantic model
+    try:
+        validated = JobIdPath(job_id=job_id)
+    except ValidationError as e:
+        return jsonify({'error': 'Invalid job ID format', 'details': e.errors()}), 400
+
+    job = get_job(validated.job_id)
     if not job:
-        return jsonify({'error': 'Job not found', 'cleaned_id': job_id}), 404
+        return jsonify({'error': 'Job not found', 'job_id': validated.job_id}), 404
     
     if job['status'] != 'completed':
         return jsonify({
@@ -358,8 +380,13 @@ if __name__ == '__main__':
     port = SERVER_CONFIG.get('port', 8888)
     host = SERVER_CONFIG.get('host', '0.0.0.0')
     debug = SERVER_CONFIG.get('debug', False)
-    
-    logger.info(f"Starting Airbais Tools Automation API on {host}:{port}")
-    logger.info(f"Available tools: {', '.join(TOOL_CONFIGS.keys())}")
-    
+
+    logger.info(
+        "api_server_starting",
+        host=host,
+        port=port,
+        debug=debug,
+        available_tools=list(TOOL_CONFIGS.keys())
+    )
+
     app.run(host=host, port=port, debug=debug)

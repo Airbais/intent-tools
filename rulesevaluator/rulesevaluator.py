@@ -1,0 +1,243 @@
+#!/usr/bin/env python3
+"""
+Rules Evaluator - Main entry point
+
+Evaluates AI responses against user-defined rules using RAG technology
+"""
+
+import argparse
+import logging
+import sys
+import json
+from pathlib import Path
+from datetime import datetime
+from typing import Dict, Any
+import colorlog
+
+# Add src to path
+sys.path.append(str(Path(__file__).parent))
+
+from src.config_manager import ConfigManager
+from src.rules_validator import RulesValidator
+
+
+def setup_logging(log_level: str = "INFO") -> None:
+    """Set up colored logging"""
+    handler = colorlog.StreamHandler()
+    handler.setFormatter(colorlog.ColoredFormatter(
+        '%(log_color)s%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        log_colors={
+            'DEBUG': 'cyan',
+            'INFO': 'green',
+            'WARNING': 'yellow',
+            'ERROR': 'red',
+            'CRITICAL': 'red,bg_white',
+        }
+    ))
+    
+    logger = logging.getLogger()
+    logger.addHandler(handler)
+    logger.setLevel(getattr(logging, log_level.upper()))
+
+
+def main():
+    """Main entry point"""
+    parser = argparse.ArgumentParser(
+        description="Rules Evaluator - Evaluate AI responses against defined rules"
+    )
+    
+    # Primary argument - rules file
+    parser.add_argument(
+        "rules_file",
+        nargs="?",
+        help="Path to JSON rules file (can also be specified in config)"
+    )
+    
+    # Optional arguments
+    parser.add_argument(
+        "--config",
+        default="config.yaml",
+        help="Path to configuration file (default: config.yaml)"
+    )
+    
+    parser.add_argument(
+        "--content-source",
+        choices=["website", "local", "cloud"],
+        help="Override content source type from config"
+    )
+    
+    parser.add_argument(
+        "--output",
+        help="Output directory for results"
+    )
+    
+    parser.add_argument(
+        "--log-level",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+        default="INFO",
+        help="Logging level"
+    )
+    
+    parser.add_argument(
+        "--no-cache",
+        action="store_true",
+        help="Disable response caching"
+    )
+    
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Validate configuration without running evaluation"
+    )
+    
+    args = parser.parse_args()
+    
+    # Set up logging
+    setup_logging(args.log_level)
+    logger = logging.getLogger(__name__)
+    
+    try:
+        # Load configuration
+        logger.info("Loading configuration...")
+        config = ConfigManager(args.config)
+        
+        # Override settings from command line
+        if args.content_source:
+            config.config['content']['type'] = args.content_source
+        
+        if args.output:
+            config.config['output']['results_dir'] = args.output
+        
+        if args.no_cache:
+            config.config['general']['enable_cache'] = False
+        
+        # Determine rules file path
+        rules_file = args.rules_file or config.get('rules.file_path')
+        if not rules_file:
+            logger.error("No rules file specified. Use positional argument or set in config.")
+            return 1
+        
+        # Update config with rules file if provided via CLI
+        if args.rules_file:
+            config.config['rules']['file_path'] = args.rules_file
+        
+        # Validate rules file
+        logger.info(f"Validating rules file: {rules_file}")
+        validator = RulesValidator(
+            strict_validation=config.get('rules.strict_validation', True),
+            normalize_case=config.get('rules.normalize_case', True)
+        )
+        
+        is_valid, rules_data, errors = validator.validate_file(rules_file)
+        
+        if not is_valid:
+            logger.error("Rules validation failed:")
+            for error in errors:
+                logger.error(f"  - {error}")
+            return 1
+        
+        logger.info("Rules validation successful")
+        logger.info(f"Found {len(rules_data['prompts'])} prompts to evaluate")
+        
+        # Count rules by type
+        rule_counts = {'critical': 0, 'important': 0, 'expected': 0, 'desirable': 0}
+        for prompt in rules_data['prompts']:
+            for rule in prompt['rules']:
+                rule_type = rule['ruletype'].lower()
+                if rule_type in rule_counts:
+                    rule_counts[rule_type] += 1
+        
+        logger.info("Rule distribution:")
+        for rule_type, count in rule_counts.items():
+            logger.info(f"  - {rule_type.capitalize()}: {count}")
+        
+        if args.dry_run:
+            logger.info("Dry run complete. Configuration and rules are valid.")
+            return 0
+        
+        # Run evaluation
+        logger.info("Starting evaluation process...")
+        
+        from src.evaluator import RulesEvaluator
+        evaluator = RulesEvaluator(config)
+        
+        results = evaluator.run_evaluation(rules_file)
+        
+        # Output files are generated by the evaluator's output generator
+        
+        # Print summary
+        overall = results['overall_results']
+        logger.info("=" * 60)
+        logger.info("EVALUATION COMPLETE")
+        logger.info("=" * 60)
+        logger.info(f"Total Prompts: {overall['total_prompts']}")
+        logger.info(f"Prompts Passed: {overall['prompts_passed']}")
+        logger.info(f"Overall Pass Rate: {overall['overall_pass_rate']}%")
+        logger.info(f"Average Score: {overall['average_score']}/100")
+        logger.info(f"Critical Failures: {overall['critical_failures']}")
+        logger.info(f"Results saved to: {results.get('generated_files', {}).get('json', 'results directory')}")
+        
+        # Return appropriate exit code
+        return 0 if overall['overall_pass_rate'] >= config.get('scoring.passing_score', 60) else 1
+        
+    except Exception as e:
+        logger.error(f"Error: {e}", exc_info=True)
+        return 1
+
+
+def _generate_summary_report(results: Dict[str, Any]) -> str:
+    """Generate markdown summary report"""
+    overall = results['overall_results']
+    
+    report = f"""# Rules Evaluation Summary
+
+**Evaluation ID:** {results['evaluation_id']}  
+**Date:** {results['timestamp'][:10]}  
+**Duration:** {results['duration_seconds']:.1f} seconds  
+**Rules File:** {results['rules_file']}  
+**Content Source:** {results['content_source']}  
+
+## Overall Results
+
+- **Total Prompts:** {overall['total_prompts']}
+- **Prompts Passed:** {overall['prompts_passed']} ({overall['overall_pass_rate']}%)
+- **Average Score:** {overall['average_score']}/100
+- **Critical Failures:** {overall['critical_failures']}
+
+## Performance by Rule Type
+
+"""
+    
+    for rule_type, pass_rate in overall['pass_rates_by_type'].items():
+        counts = overall['total_rules_by_type'][rule_type]
+        report += f"- **{rule_type.title()}:** {counts['passed']}/{counts['total']} ({pass_rate}%)\n"
+    
+    report += f"""
+## Database Statistics
+
+- **Total Documents:** {results['database_stats']['total_documents']}
+- **Total Chunks:** {results['database_stats']['total_chunks']}
+- **Embedding Model:** {results['database_stats']['embedding_model']}
+
+## Individual Prompt Results
+
+"""
+    
+    for i, prompt_result in enumerate(results['prompt_evaluations']):
+        status = "✅ PASSED" if prompt_result['passed'] else "❌ FAILED"
+        report += f"""
+### Prompt {i+1}: {status}
+
+**Prompt:** {prompt_result['prompt']}  
+**Score:** {prompt_result['score']}/100  
+**Rules Passed:** {prompt_result['rules_summary']['rules_passed']}/{prompt_result['rules_summary']['total_rules']}  
+
+**Summary:** {prompt_result['summary']}
+
+"""
+    
+    return report
+
+
+if __name__ == "__main__":
+    sys.exit(main())

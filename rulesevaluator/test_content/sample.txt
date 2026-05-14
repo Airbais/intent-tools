@@ -1,0 +1,21 @@
+Sample Content for Testing
+
+This is a sample text file that contains information about our company's policies and features.
+
+Return Policy:
+Our company offers a generous 30-day return policy. All items must be returned in their original condition with tags still attached. Once we receive your return, refunds are processed within 5-7 business days back to your original payment method. For any questions about returns, please contact our customer service team at support@example.com or call 1-800-EXAMPLE.
+
+Premium Subscription Features:
+Our premium subscription includes several exclusive benefits:
+1. Unlimited access to all premium content and features
+2. Priority customer support with 24/7 availability
+3. Advanced analytics and reporting dashboard
+4. Early access to new features and updates
+5. Ad-free browsing experience
+
+The premium subscription is priced at $19.99 per month or $199 annually (saving you over 15%). Unlike our free tier which limits you to 10 items per month, premium users enjoy unlimited usage. We also offer a 14-day free trial so you can experience all the benefits risk-free.
+
+Contact Information:
+Email: support@example.com
+Phone: 1-800-EXAMPLE
+Hours: Monday-Friday 9AM-6PM EST

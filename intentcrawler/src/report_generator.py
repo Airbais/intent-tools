@@ -71,6 +71,7 @@ class ReportGenerator:
     
     def generate_dashboard_data(self, intent_data: Dict, site_structure: Dict) -> str:
         dashboard_data = {
+            'tool_type': 'intentcrawler',
             'discovered_intents': intent_data.get('discovered_intents', []),
             'by_section': intent_data.get('by_section', {}),
             'total_pages_analyzed': intent_data.get('total_pages_analyzed', 0),

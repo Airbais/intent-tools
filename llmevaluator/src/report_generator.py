@@ -65,6 +65,7 @@ class ReportGenerator:
         
         # Build complete dashboard data
         dashboard_data = {
+            'tool_type': 'llmevaluator',
             'evaluation_results': evaluation_results,
             'aggregate_metrics': metrics_dict,
             'insights': insights,
@@ -158,6 +159,7 @@ class ReportGenerator:
         
         # Build complete dashboard data
         dashboard_data = {
+            'tool_type': 'llmevaluator',
             'metadata': metadata,
             'llm_metrics': llm_metrics_dict,
             'comparative_metrics': comparative_metrics,

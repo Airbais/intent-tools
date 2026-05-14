@@ -1,0 +1,169 @@
+# Rules Evaluator Configuration
+
+# Content source settings
+content:
+  # Type: website, local, or cloud
+  type: "website"
+  
+  # For website type
+  website:
+    url: "https://airbais.com"
+    max_pages: 50
+    crawl_depth: 3
+    respect_robots: true
+    delay_between_requests: 1.0
+  
+  # For local type
+  local:
+    path: "./test_content"
+    recursive: true
+    max_depth: 5
+    file_patterns:
+      - "*.md"
+      - "*.html"
+      - "*.txt"
+      - "*.json"
+      - "*.csv"
+      - "*.docx"
+  
+  # For cloud type
+  cloud:
+    provider: "google_drive"  # google_drive, onedrive, dropbox
+    folder_id: ""
+    recursive: true
+    max_depth: 5
+
+# RAG Database settings
+rag:
+  # ChromaDB settings
+  persist_directory: "./chromadb_data"
+  collection_name: "rules_evaluator"
+  
+  # Embedding settings
+  embedding_model: "text-embedding-3-small"
+  chunk_size: 1000
+  chunk_overlap: 200
+  
+  # Update strategy: overwrite or update
+  update_strategy: "overwrite"
+
+# AI Provider settings (following LLM Evaluator pattern)
+ai_providers:
+  # Provider for generating responses
+  response_provider:
+    - name: "openai"
+      api_key: "${OPENAI_API_KEY}"
+      model: "gpt-4-turbo-preview"
+      temperature: 0.7
+      max_tokens: 2000
+    
+    - name: "anthropic"
+      api_key: "${ANTHROPIC_API_KEY}"
+      model: "claude-3-opus-20240229"
+      temperature: 0.7
+      max_tokens: 2000
+  
+  # Provider for evaluating responses against rules
+  evaluation_provider:
+    - name: "openai"
+      api_key: "${OPENAI_API_KEY}"
+      model: "gpt-4-turbo-preview"
+      temperature: 0.3
+      max_tokens: 1000
+
+# Rules file settings
+rules:
+  # Path to the JSON rules file
+  file_path: "./rules/example_rules.json"
+  
+  # Validation settings
+  strict_validation: true
+  normalize_case: true
+
+# Scoring settings
+scoring:
+  # Minimum passing score (0-100)
+  passing_score: 60
+  
+  # Rule type weights (must add up to 100 when critical passes)
+  weights:
+    important: 50
+    expected: 35
+    desirable: 15
+  
+  # Satisfaction levels
+  satisfaction_scores:
+    fully_satisfied: 100
+    mostly_satisfied: 75
+    partially_satisfied: 50
+    minimally_satisfied: 25
+    not_satisfied: 0
+
+# Evaluation prompt (can be customized by user)
+evaluation_prompt: |
+  You are an expert AI response evaluator. Your task is to evaluate an AI-generated response against specific rules and assign scores.
+
+  ## Evaluation Process:
+  1. Read the AI response carefully
+  2. For each rule, determine if the response satisfies it
+  3. Assign points based on how well the rule is satisfied:
+     - Fully satisfied: 100% of allocated points
+     - Mostly satisfied: 75% of allocated points
+     - Partially satisfied: 50% of allocated points
+     - Minimally satisfied: 25% of allocated points
+     - Not satisfied: 0% of allocated points
+
+  ## Rule Types and Weights:
+  - CRITICAL: If not satisfied, entire prompt fails (0 points total)
+  - IMPORTANT: Worth 50% of non-critical points
+  - EXPECTED: Worth 35% of non-critical points
+  - DESIRABLE: Worth 15% of non-critical points
+
+  ## Response Format:
+  Provide your evaluation in this JSON format:
+  {
+    "rules_evaluation": [
+      {
+        "rule": "exact rule description",
+        "type": "rule type",
+        "satisfied": true/false,
+        "score_percentage": 0-100,
+        "reasoning": "brief explanation"
+      }
+    ],
+    "total_score": 0-100,
+    "passed": true/false,
+    "summary": "2-3 sentence summary of strengths and weaknesses"
+  }
+
+  Be objective and consistent in your evaluations. Focus on whether the response actually addresses what the rule requires, not on style or formatting unless specifically mentioned in the rule.
+
+# Output settings
+output:
+  # Directory for results
+  results_dir: "./results"
+  
+  # Response logging
+  log_responses: true
+  response_log_file: "ai_responses.log"
+  
+  # Report formats
+  generate_html_report: true
+  generate_markdown_report: true
+  
+  # Dashboard integration
+  generate_dashboard_json: true
+
+# General settings
+general:
+  # Logging level: DEBUG, INFO, WARNING, ERROR
+  log_level: "INFO"
+  
+  # Cache settings
+  enable_cache: true
+  cache_dir: "./cache"
+  cache_ttl_hours: 24
+  
+  # Performance settings
+  max_concurrent_requests: 5
+  timeout_seconds: 30
